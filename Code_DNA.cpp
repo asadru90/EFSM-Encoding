@@ -1,7 +1,7 @@
 /******************************************************************************
 
                     C++ Code written by Asad Usmani on 25/11/2021
-					  A novel DNA encoding and decoding scheme
+		      A novel DNA encoding and decoding scheme
 
 *******************************************************************************/
 
@@ -205,7 +205,8 @@ string encodeDNAStr(string inputStr) {
 
 int main()
 {
-    int strSize = 60000;
+    int strSize = 24;
+    bool printFlag = true;
     string inputStr = "";
     int countNT[4] = {0, 0, 0, 0};
     
@@ -222,14 +223,17 @@ int main()
     }
     
     string inputDNAStr = convertIntoDNAStr(inputStr);
-    //cout << "\nBefore Encoding DNA String:" << inputDNAStr;
-    //cout << "  and length:" << strSize;
-    
+
     string encodeOutStr = encodeDNAStr(inputDNAStr);
-    //cout << "\nAfter  Encoding DNA String:" << encodeOutStr;
-    
+	
     string decodeOutStr = decodeDNAStr(encodeOutStr);
-    //cout << "\nAfter  Decoding DNA String:" << decodeOutStr;
+	
+    if (printFlag == true) {
+    	cout << "\nBefore Encoding DNA String:" << inputDNAStr;
+    	cout << "  and length:" << strSize;
+   	cout << "\nAfter  Encoding DNA String:" << encodeOutStr;
+   	cout << "\nAfter  Decoding DNA String:" << decodeOutStr;
+    }
     
     bool homopolymers = false;
     for (int i = 0 ; i < encodeOutStr.length()-4 ; i++)

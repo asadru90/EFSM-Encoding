@@ -8,9 +8,10 @@
 #include <iostream>
 #include <string>
 #include <cstdlib>
+#include <cmath>
 
 using namespace std;
-
+int printFlag = 1;
 
 char convertDNATable[4][4] = {  {'A', 'T', 'C', 'G'},
                                 {'T', 'C', 'G', 'A'},
@@ -44,6 +45,28 @@ int convertNTtoInt(char inNt) {
     return outIdx;
 }
 
+
+string convertIdxtoNTStr(int inIdx) {
+   
+    string outNt = "";
+    int i = inIdx, j = 0, k = 4;
+    while (k > 0)
+    {
+        int p = pow(4,k-1);
+        j = i / p;
+        i = i % p;
+        switch (j) {
+            case 0 : outNt += 'A'; break;
+            case 1 : outNt += 'T'; break;
+            case 2 : outNt += 'C'; break;
+            case 3 : outNt += 'G'; break;
+            default: return outNt;
+        }
+        k = k - 1;
+    }
+    return outNt;
+}
+
 char convertInttoNT(int inIdx) {
    
     char outNt;
@@ -71,6 +94,82 @@ string convertIntoDNAStr(string str) {
         }
     }
     return outDNAStr;
+}
+
+string convertIntintoNT(int val) {
+    
+    string charNt;
+        switch (val) {
+            case 0 : charNt = "A"; break;
+            case 1 : charNt = "T"; break;
+            case 2 : charNt = "C"; break;
+            case 3 : charNt = "G"; break;
+            default: return "";
+        }
+    return charNt;
+}
+
+
+int ** calcVarianceGC(string encodeOutStr, int sublength)
+{
+    int prevSubSeq = 0;
+    int nextSubSeq = 0;
+    int countSubSeq = 0;
+    int **matrixSubSeq = new int*[256];
+    for (int k = 0 ; k < 256; k++)
+    {
+        matrixSubSeq[k] = new int[256];
+    }
+    
+    for (int j = 0 ; j < 256; j++)
+    {
+        for (int k = 0 ; k < 256; k++)
+        {
+            matrixSubSeq[j][k] = 0;
+        }
+    }
+    int count= 0;
+    for (int k = 0; k < sublength; k ++)
+    {
+        for (int j = k; j < encodeOutStr.length()-sublength+1; j = j+sublength)
+        {
+            int countNT[4] = {  convertNTtoInt(encodeOutStr[j]), 
+                                convertNTtoInt(encodeOutStr[j+1]), 
+                                convertNTtoInt(encodeOutStr[j+2]), 
+                                convertNTtoInt(encodeOutStr[j+3])
+            };
+            
+            nextSubSeq = countNT[0]*64 + countNT[1]*16 + countNT[2]*4 + countNT[3];
+            matrixSubSeq[prevSubSeq][nextSubSeq] = matrixSubSeq[prevSubSeq][nextSubSeq] + 1; 
+            prevSubSeq = nextSubSeq;
+        }
+    }
+    return matrixSubSeq;
+}
+
+
+int * calcPercentGC(string encodeOutStr, int parts)
+{
+    int k = encodeOutStr.length()/parts;
+    int *matrixParts = new int[parts];
+    
+    for (int j = 0; j < parts ; j++)
+    {
+        int countNT[4] = {0, 0, 0, 0};
+        for (int i = j*k; i < (j*k)+k ; i++)
+        {
+            (
+            encodeOutStr[i] == 'A' ? countNT[0] += 1: 
+            encodeOutStr[i] == 'T' ? countNT[1] += 1: 
+            encodeOutStr[i] == 'C' ? countNT[2] += 1: 
+	        countNT[3] += 1
+	        );
+        }
+        int sumAT = countNT[0] + countNT[1]; 
+        int sumGC = countNT[2] + countNT[3];
+        matrixParts[j] = sumGC;
+    }
+    return matrixParts;
 }
 
 string decodeDNAStr(string inputStr) {
@@ -202,14 +301,22 @@ string encodeDNAStr(string inputStr) {
     return outStr;
 }
 
-
-int main()
+bool checkHomopolymers(string encodeDNAStr, int subSeqeunceLength)
 {
-    int strSize = 24;
-    bool printFlag = true;
+    bool homopolymers = false;
+    for (int i = 0 ; i < encodeDNAStr.length()-subSeqeunceLength ; i++)
+    {
+        if ((encodeDNAStr[i] == encodeDNAStr[i+1]))
+        {
+            homopolymers = true;
+        }
+    } 
+    return false;
+}
+
+string inputBinaryStrGen(int strSize)
+{
     string inputStr = "";
-    int countNT[4] = {0, 0, 0, 0};
-    
     srand (time(NULL));
     for (int i =0 ; i < strSize ; i++)
     {
@@ -221,62 +328,135 @@ int main()
 			inputStr += '0'
 		);
     }
-    
-    string inputDNAStr = convertIntoDNAStr(inputStr);
+    return inputStr;
+}
 
-    string encodeOutStr = encodeDNAStr(inputDNAStr);
-	
-    string decodeOutStr = decodeDNAStr(encodeOutStr);
-	
-    if (printFlag == true) {
-    	cout << "\nBefore Encoding DNA String:" << inputDNAStr;
-    	cout << "  and length:" << strSize;
-   	cout << "\nAfter  Encoding DNA String:" << encodeOutStr;
-   	cout << "\nAfter  Decoding DNA String:" << decodeOutStr;
+bool checkEncodeDecode(string inputDNAStr, string decodeOutStr)
+{
+    return inputDNAStr.compare(decodeOutStr);
+}
+
+void printMatrixGCContent(int * matrixGCcontent, int parts, int totalLen)
+{
+    cout << "\n ================= GC Content =====================";
+    for (int j = 0; j < parts; j++)
+    {
+        cout << "\nPart." << j+1 << ".GC Content:" << (matrixGCcontent[j]*100)/(totalLen/parts) << "%";
+    }
+    cout << "\n ================= GC Content =====================";
+}
+
+void printMatrixGCVariance(int ** matrixSubSeq, int subSeqeunceLength)
+{
+    cout << "\n ================= GC Variation =====================";
+    int count = 0, flag = 0;
+    int martixLen = pow(4, subSeqeunceLength);
+    int *matrixSubSeqCol = new int[martixLen];
+    int *matrixSubSeqRow = new int[martixLen];
+    
+    for (int j = 0 ; j < martixLen; j++)
+    {
+        flag = 0;
+        for (int k = 0 ; k < martixLen; k++)
+        {
+            if ( matrixSubSeq[j][k] > 0)   
+            {
+                flag = 1;
+            }
+        }
+        if (flag) 
+            matrixSubSeqRow[j] = 1;
+        else
+            matrixSubSeqRow[j] = 0;
+    } 
+    
+    for (int j = 0 ; j < martixLen; j++)
+    {
+        flag = 0;
+        for (int k = 0 ; k < martixLen; k++)
+        {
+            if ( matrixSubSeq[k][j] > 0)   
+            {
+                flag = 1;
+            }
+        }
+        if (flag) 
+            matrixSubSeqCol[j] = 1;
+        else
+            matrixSubSeqCol[j] = 0;
     }
     
-    bool homopolymers = false;
-    for (int i = 0 ; i < encodeOutStr.length()-4 ; i++)
+    for (int j = 0 ; j < martixLen; j++)
     {
-        if ((encodeOutStr[i] == encodeOutStr[i+1]))
+        if (printFlag && matrixSubSeqRow[j] ) 
         {
-            homopolymers = true;
-            cout << "\n Index of duplication!" << i ;
+            cout << "\nRow#" << count++ << "_" << convertIdxtoNTStr(j) << ":";
+            for (int k = 0 ; k < martixLen; k++)
+            {
+                if ( matrixSubSeq[j][k] > 0)   
+                {
+                    if (printFlag) cout << "_" <<convertIdxtoNTStr(k) << "_";
+                }
+                else if (matrixSubSeqCol[k])
+                {
+                    if (printFlag) cout << ".";
+                }
+            }
         }
     }
-    
-    for (int i =0 ; i < encodeOutStr.length() ; i++)
+    cout << "\n ================= GC Variation =====================";
+}
+
+void mainPrint(bool printFlag , int indNo, string outStr)
+{
+    switch(indNo)
     {
-        (
-        encodeOutStr[i] == 'A' ? countNT[0] += 1: 
-        encodeOutStr[i] == 'T' ? countNT[1] += 1: 
-        encodeOutStr[i] == 'C' ? countNT[2] += 1: 
-	    countNT[3] += 1
-	    );
+        case 0: if (printFlag) cout << "\nInput DNA String:" << outStr; 
+        break;
+        case 1: if (printFlag) cout << "\nEncoded String:" << outStr; 
+        break;
+        case 2: if (printFlag) cout << "\nDecoded String:" << outStr; 
+        break;
+        case 3: if (printFlag) cout << "\nEncoding-Decoding Correctness:" << outStr;
+        break;
+        case 4: if (printFlag) cout << "\nHomopolymers don't exit:" << outStr; 
+        break;
+        default: if (printFlag) cout << "\nProgram Completed:" << outStr; 
     }
+}
+
+int main()
+{
+    // input binary string length
+    int strSize = 450, contentGCParts=10, subSeqeunceLength=4;
+    // enable or disable all the console printing
+    bool printAll = false;
     
-    int sumAT = countNT[0] + countNT[1]; 
-    int sumGC = countNT[2] + countNT[3];
+    //generate a random input binary string of given length
+    string inputStr = inputBinaryStrGen(strSize);
+    
+    //generate DNA seqeunce from input binary string
+    string inputDNAStr = convertIntoDNAStr(inputStr);
+    
+    //Encode the DNA sequence using our proposed method
+    string encodeOutStr = encodeDNAStr(inputDNAStr);
+    
+    //Conversely, Decoding is performed below 
+    string decodeOutStr = decodeDNAStr(encodeOutStr);
+
    
-    if ((inputDNAStr.compare(decodeOutStr)) == 0)
-        cout << "\n\n1. Encoding-Decoding Correctness!OK";
-    else
-        cout << "\n\n1. Something is wrong with Encoding or Decoding!NK";
-    
-    if (!homopolymers)
-        cout << "\n2. Homopolymers                 !OK";
-    else
-        cout << "\n2. Homopolymers !NK";
+    int * matrixGCcontent = calcPercentGC(encodeOutStr, contentGCParts);
+    int ** martixGCVariance = calcVarianceGC(encodeOutStr, subSeqeunceLength);
+   
+    // printing could be performed using the below lines of code, disable indivitual printing using fasle instead.
+    mainPrint(printAll && true , 0 , inputDNAStr);
+    mainPrint(printAll && true , 1 , encodeOutStr);
+    mainPrint(printAll && true , 2 , decodeOutStr);
+    mainPrint(printAll && true , 3 , (checkEncodeDecode(inputDNAStr, decodeOutStr) == 0 ? "OK.": "Not Ok."));
+    mainPrint(printAll && true , 4 , (checkHomopolymers(encodeOutStr, subSeqeunceLength) == 0 ? "OK.": "Not Ok."));
+    printMatrixGCContent(matrixGCcontent, contentGCParts, encodeOutStr.length());
+    printMatrixGCVariance(martixGCVariance, subSeqeunceLength);
+    mainPrint(true && true , 6 , "Done!");
         
-    if (sumAT > sumGC)
-        cout << "\n3. Highly Balanced-GC Contents  !OK";
-    else
-        cout << "\n3.Less Balanced-GC Contents!NK";
-    
-    cout << "\n4. Total(A+T+C+G) = " << sumAT + sumGC 
-    << ";  A+T=" << sumAT << ", " << (sumAT*100/(sumAT + sumGC)) << "%"
-    << ";  C+G=" << sumGC << ", " << (sumGC*100/(sumAT + sumGC)) << "%"
-    << ";  Diff=" << (sumAT*100/(sumAT + sumGC)) - (sumGC*100/(sumAT + sumGC)) << "%";
-    
     return 0;
 }

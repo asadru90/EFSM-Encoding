@@ -390,31 +390,41 @@ void printMatrixGCVariance(int ** matrixSubSeq, int subSeqeunceLength)
     cout << "\n";
     for (int j = 0 ; j < martixLen; j++)
     {
-        if (printFlag && matrixSubSeqRow[j] ) 
+        if (printFlag && matrixSubSeqRow[j] && (j%5 == 0)) 
         {
-            cout << ", " << "\"" <<convertIdxtoNTStr(j) << "\"";
+            cout << "," << "\"" <<convertIdxtoNTStr(j) << "\"";
         }
     }
     
-    cout << "\n";
+    cout << "\n[";
     for (int j = 0 ; j < martixLen; j++)
     {
-        if (printFlag && matrixSubSeqRow[j] ) 
+        if (printFlag && matrixSubSeqRow[j] && j%5 == 0) 
         {
-            cout << "\n";
+            cout << "\n[";
+            int flagTemp = 0;
             for (int k = 0 ; k < martixLen; k++)
             {
-                if ( matrixSubSeq[j][k] > 0)   
+                if (k%5 == 0)
                 {
-                    if (printFlag) cout << matrixSubSeq[j][k] << ", ";
-                }
-                else if (matrixSubSeqCol[k])
-                {
-                    if (printFlag) cout << "0, ";
+                    if ( matrixSubSeq[j][k] > 0)   
+                    {
+                        if (printFlag) cout << matrixSubSeq[j][k] << ",";
+                    }
+                    else if (matrixSubSeqCol[k] || k==(martixLen-1))
+                    {
+                        if (printFlag && k<(martixLen-1)) 
+                        {
+                            cout << "0,";
+                        }
+                        else cout << "0";
+                    }
                 }
             }
+            cout << "],";
         }
     }
+    cout << "]";
     cout << "\n ================= GC Variation =====================";
 }
 
@@ -439,7 +449,7 @@ void mainPrint(bool printFlag , int indNo, string outStr)
 int main()
 {
     // input binary string length
-    int strSize = 1500, contentGCParts=10, subSeqeunceLength=4;
+    int strSize = 15000, contentGCParts=10, subSeqeunceLength=4;
     // enable or disable all the console printing
     bool printAll = false;
     

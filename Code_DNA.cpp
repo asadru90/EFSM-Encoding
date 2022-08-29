@@ -386,20 +386,31 @@ void printMatrixGCVariance(int ** matrixSubSeq, int subSeqeunceLength)
             matrixSubSeqCol[j] = 0;
     }
     
+    
+    cout << "\n";
     for (int j = 0 ; j < martixLen; j++)
     {
         if (printFlag && matrixSubSeqRow[j] ) 
         {
-            cout << "\nRow#" << count++ << "_" << convertIdxtoNTStr(j) << ":";
+            cout << ", " << "\"" <<convertIdxtoNTStr(j) << "\"";
+        }
+    }
+    
+    cout << "\n";
+    for (int j = 0 ; j < martixLen; j++)
+    {
+        if (printFlag && matrixSubSeqRow[j] ) 
+        {
+            cout << "\n";
             for (int k = 0 ; k < martixLen; k++)
             {
                 if ( matrixSubSeq[j][k] > 0)   
                 {
-                    if (printFlag) cout << "_" <<convertIdxtoNTStr(k) << "_";
+                    if (printFlag) cout << matrixSubSeq[j][k] << ", ";
                 }
                 else if (matrixSubSeqCol[k])
                 {
-                    if (printFlag) cout << ".";
+                    if (printFlag) cout << "0, ";
                 }
             }
         }
@@ -428,7 +439,7 @@ void mainPrint(bool printFlag , int indNo, string outStr)
 int main()
 {
     // input binary string length
-    int strSize = 450, contentGCParts=10, subSeqeunceLength=4;
+    int strSize = 1500, contentGCParts=10, subSeqeunceLength=4;
     // enable or disable all the console printing
     bool printAll = false;
     
@@ -454,7 +465,7 @@ int main()
     mainPrint(printAll && true , 2 , decodeOutStr);
     mainPrint(printAll && true , 3 , (checkEncodeDecode(inputDNAStr, decodeOutStr) == 0 ? "OK.": "Not Ok."));
     mainPrint(printAll && true , 4 , (checkHomopolymers(encodeOutStr, subSeqeunceLength) == 0 ? "OK.": "Not Ok."));
-    printMatrixGCContent(matrixGCcontent, contentGCParts, encodeOutStr.length());
+    //printMatrixGCContent(matrixGCcontent, contentGCParts, encodeOutStr.length());
     printMatrixGCVariance(martixGCVariance, subSeqeunceLength);
     mainPrint(true && true , 6 , "Done!");
         

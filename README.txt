@@ -7,26 +7,47 @@ e.g, 12, 24, 48, 60, 600 etc.
 
 
 --------------------------------------------------------------
+Input DNA String: AGACTGACTATCCGACGATCCGCCAAGTGTCATCCCCCAGCTTTTCGACTCAAAGAACTAGGAACCCATGGGAAATCATTTATTAATTCCTCTTCGGTGAACAAGACTAGCTGACAAGTGTCTGGGCCACGAAGTGGGTACGTCGACAGG
+Encoded String: AGATCTGTACTCATCACGATCGAGTGCTGACTATGCTGTACATGCACTCGATGCTATATACGAGCTCTACACGCAGCTATGTACATCTCATAGAGCACAGTCAGTATGACTCAGTATGCGTCTGTCGAGTGCAGCTATGTACTGAGCGTGAGCTATGTGCTCTAGAGACGAGCGACAGTAGAGATACAGTCTGACTACGA
+Decoded String:
+AGACTGACTATCCGACGATCCGCCAAGTGTCATCCCCCAGCTTTTCGACTCAAAGAACTAGGAACCCATGGGAAATCATTTATTAATTCCTCTTCGGTGAACAAGACTAGCTGACAAGTGTCTGGGCCACGAAGTGGGTACGTCGACAGG
 
-Sample Output 1: with strSize=24 and printFlag=true
+Encoding-Decoding Correctness:OK.
 
-Before Encoding DNA String:ATGCGGTCCTGTATTGTCTTAAAT  and length:24
-After  Encoding DNA String:ATGACAGATGCATGTGACTCGTCATGACAGTC
-After  Decoding DNA String:ATGCGGTCCTGTATTGTCTTAAAT
+Homopolymers don't exit:OK.
+================= GC Content =====================
+Part.1.GC Content:40%
+Part.2.GC Content:50%
+Part.3.GC Content:40%
+Part.4.GC Content:55%
+Part.5.GC Content:45%
+Part.6.GC Content:45%
+Part.7.GC Content:50%
+Part.8.GC Content:55%
+Part.9.GC Content:50%
+Part.10.GC Content:45%
+================= GC Content =====================
 
-1. Encoding-Decoding Correctness!OK
-2. Homopolymers                 !OK
-3. Highly Balanced-GC Contents  !OK
-4. Total(A+T+C+G) = 32;  A+T=17, 53%;  C+G=15, 46%;  Diff=7%
-
---------------------------------------------------------------
-
-Sample Output 2: with strSize=24 and printFlag=false
-
-1. Encoding-Decoding Correctness!OK
-2. Homopolymers                 !OK
-3. Highly Balanced-GC Contents  !OK
-4. Total(A+T+C+G) = 32;  A+T=17, 53%;  C+G=15, 46%;  Diff=7%
-
----------------------------------------------------------------
-  
+================= GC Variation =====================
+,"AAAA","ATCT","ATGC","ACAG","AGAC","AGTG","TACG","TCTA","TGAG","TGCA","CATG","CTAT","CTCG","GACA","GAGT","GTAC","GTGA","GCTC"
+[
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0],
+[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],]
+ ================= GC Variation =====================
+Program Completed:Done!

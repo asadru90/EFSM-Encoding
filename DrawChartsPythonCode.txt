@@ -1,0 +1,105 @@
+https://matplotlib.org/stable/gallery/images_contours_and_fields/image_annotated_heatmap.html
+
+
+============================================= Sample 1 ===================================
+import matplotlib.pyplot as plt
+import numpy as np
+
+
+sequenceA = ["AGCT", "ACTA", "ACTA", "ACTA", "ACGC", "AGAT", "AGTG", "AGTG", "AGCG", "TATC", "TATG", "TACA", "TACA", "TACT", "TACT","TACT", "TAGA", "TCAT", "TCTC", "TCGA", "TGAC", "TGAG", "TGTA", "TGCA", "TGCA", "TGCG", "CATA", "CATA", "CACA", "CAGC", "CTCT", "CTGT", "CGAC", "CGAG", "CGCT", "GATA", "GATC", "GACA", "GACT", "GACG", "GACG", "GAGA", "GAGA", "GAGA", "GTAT", "GTAT", "GTAC", "GTAC", "GTGC", "GCTC"]
+#Unemployment_Rate = ["AAAA", "ACTA", "ACTA", "ACTA", "ACGC", "AGAT", "AGTG", "AGTG", "AGCG", "TATC", "TATG", "TACA", "TACA", "TACT", "TACT","TACT", "TAGA", "TCAT", "TCTC", "TCGA", "TGAC", "TGAG", "TGTA", "TGCA", "TGCA", "TGCG", "CATA", "CATA", "CACA", "CAGC", "CTCT", "CTGT", "CGAC", "CGAG", "CGCT", "GATA", "GATC", "GACA", "GACT", "GACG", "GACG", "GAGA", "GAGA", "GAGA", "GTAT", "GTAT", "GTAC", "GTAC", "GTGC", "GCTC"]
+sequenceB = ["GACT", "TACT", "TGAG", "GACA", "TATC", "GAGA", "TCAT", "CATA", "TGCG", "GTAC", "AGTG", "CTCT", "GACT", "ACTA", "AGAT", "GTAC", "CGAG", "CTGT", "AGCG", "TACA", "AGTG", "TCTC", "GTAT", "TGCA", "GACG", "ACGC", "TCGA", "GATC", "CAGC", "TACT", "GACG", "GTGC", "TGCA", "CGCT", "GAGA", "GTAT", "GCTC", "CGAC", "CACA", "ACTA", "TAGA", "TGAC", "TGCA", "CACA", "ACTA", "CATA", "TATG", "GAGA", "TGTA", "GATA"]
+
+
+calories =[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+
+
+fig = plt.figure(figsize=(6,6))
+ax = plt.subplot(111)
+
+#my_color = np.where((sequenceB[i] != sequenceA[i]), 'orange', 'skyblue')
+
+#sc = plt.scatter(sequenceA,sequenceB, s = 50, c=my_color, marker='o')
+
+#cbar = fig.colorbar(sc, orientation='horizontal')
+
+
+col=[]
+for i in range(0,len(sequenceB)):
+    if calories[i]> 1:
+        col.append('r')
+    else:
+        col.append('b')
+
+#scatter plot
+for i in range(len(sequenceB)):
+    plt.scatter(sequenceA[i],sequenceB[i],c=col[i],s=50, linewidth=0)
+
+plt.xticks(rotation=90)
+
+plt.show()
+
+
+============================================= Sample 1 ===================================
+
+
+============================================= Sample 2 ===================================
+import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
+
+vegetables = ["ATCT","ATGC","ACAG","ACGT","AGAC","AGTG","TATC","TACG","TCTA","TCGC","TGAG","TGCA","CATG","CAGA","CTAT","CTCG","CGTA","CGCT","GACA","GAGT","GTAC","GTGA","GCAT","GCTC"]
+farmers = ["ATCT","ATGC","ACAG","ACGT","AGAC","AGTG","TATC","TACG","TCTA","TCGC","TGAG","TGCA","CATG","CAGA","CTAT","CTCG","CGTA","CGCT","GACA","GAGT","GTAC","GTGA","GCAT","GCTC"]
+
+harvest = np.array([
+[0,3,3,2,0,2,0,0,0,0,0,0,2,0,3,0,5,1,5,4,1,0,2,1],
+[0,3,4,2,0,2,2,1,3,4,4,2,0,0,0,0,0,0,3,1,3,1,1,2],
+[1,1,5,2,0,3,2,6,1,3,3,2,2,4,1,3,1,0,0,0,0,0,0,0],
+[1,2,8,1,3,1,0,0,0,0,0,0,4,2,0,0,7,1,2,2,6,5,0,4],
+[2,2,5,2,2,3,2,1,1,1,4,0,0,0,0,0,0,0,2,0,1,2,0,0],
+[2,3,2,2,0,1,0,2,4,0,1,3,2,5,3,1,2,0,0,0,0,0,0,0],
+[3,5,3,3,1,4,4,1,0,1,1,4,0,0,0,0,0,0,3,4,2,5,1,3],
+[3,3,5,5,4,0,2,1,1,0,1,2,3,1,4,3,1,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,1,0,2,0,2,3,1,0,1,3,1,3,1,3,5,3,3,4],
+[1,1,0,4,0,1,3,2,0,0,2,0,0,0,0,0,0,0,1,0,1,0,0,1],
+[1,3,3,1,1,1,5,3,1,1,1,2,1,1,2,7,3,1,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,4,0,3,4,3,3,1,3,3,4,5,1,1,3,7,5,0],
+[1,3,5,3,4,4,3,4,4,3,4,3,2,1,0,3,0,4,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,1,0,2,2,2,1,2,0,2,2,0,3,4,3,0,1,0],
+[0,1,2,1,1,3,0,0,0,0,0,0,6,1,1,4,3,1,3,1,1,5,5,2],
+[0,2,3,1,1,1,1,2,1,1,2,2,5,0,1,2,2,1,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,2,3,0,3,3,1,2,3,2,2,5,2,0,2,0,2,4],
+[1,2,2,1,4,2,0,0,0,0,0,0,2,1,0,0,5,0,1,1,2,3,0,3],
+[0,0,0,0,0,0,4,3,2,3,1,3,2,4,4,1,2,2,2,4,3,3,1,0],
+[3,4,3,2,2,5,0,0,0,0,0,0,5,0,1,0,1,0,4,0,1,2,2,2],
+[1,1,2,2,3,1,5,4,2,1,2,2,0,0,0,0,0,0,7,4,2,1,4,2],
+[0,0,0,0,0,0,6,2,1,1,5,3,4,0,2,2,2,2,0,2,2,4,4,0],
+[1,1,1,3,3,1,0,0,0,0,0,0,7,0,0,1,2,3,6,4,2,2,0,2],
+[1,1,4,0,2,1,3,1,1,0,0,3,0,0,0,0,0,0,3,1,5,1,5,2],])
+
+fig, ax = plt.subplots()
+im = ax.imshow(harvest)
+
+# Show all ticks and label them with the respective list entries
+ax.set_xticks(np.arange(len(farmers)), labels=farmers)
+ax.set_yticks(np.arange(len(vegetables)), labels=vegetables)
+
+# Rotate the tick labels and set their alignment.
+plt.setp(ax.get_xticklabels(), rotation=90, ha="right",
+         rotation_mode="anchor")
+
+# Loop over data dimensions and create text annotations.
+for i in range(len(vegetables)):
+    for j in range(len(farmers)):
+        if i != j:
+            text = ax.text(j, i, harvest[i, j],
+                          ha="center", va="center", color="w")
+        else:
+            text = ax.text(j, i, harvest[i, j],
+                           ha="center", va="center", color="r")
+
+ax.set_title("GC variation over the randomly created sequence.")
+fig.tight_layout()
+plt.show()
+
+============================================= Sample 2 ===================================

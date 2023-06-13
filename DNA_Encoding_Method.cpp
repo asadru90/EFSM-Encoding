@@ -1,6 +1,6 @@
 /******************************************************************************
 
-                    C++ Code written by Asad Usmani on 25/11/2021
+                    C++ Code written by Asad Usmani on 09/06/2023
 		      A novel DNA encoding and decoding scheme
 
 *******************************************************************************/
@@ -18,14 +18,27 @@ char convertDNATable[4][4] = {  {'A', 'T', 'C', 'G'},
                                 {'C', 'G', 'A', 'T'},
                                 {'G', 'A', 'T', 'C'}
                             };
+         
+char rightTable[4][4]   =   {  {'C', 'C', 'T', 'C'},
+                                {'C', 'C', 'G', 'A'},
+                                {'T', 'G', 'T', 'A'},
+                                {'C', 'A', 'A', 'T'}
+                            };
                             
-char rightTable[4][4]  =    {   {'T', 'C', 'T', 'C'},
+char leftTable[4][4]    =   {  {'G', 'G', 'G', 'T'},
+                                {'G', 'G', 'A', 'C'},
+                                {'G', 'A', 'A', 'T'},
+                                {'T', 'C', 'T', 'A'}
+                            };
+    
+                       
+char rightTable1[4][4]  =   {   {'T', 'C', 'T', 'C'},
                                 {'C', 'G', 'G', 'A'},
                                 {'T', 'G', 'T', 'A'},
                                 {'C', 'A', 'A', 'T'}
                             };
                             
-char leftTable[4][4]    =   {   {'C', 'G', 'G', 'T'},
+char leftTable1[4][4]   =   {   {'C', 'G', 'G', 'T'},
                                 {'G', 'A', 'A', 'C'},
                                 {'G', 'A', 'A', 'T'},
                                 {'T', 'C', 'T', 'A'}
@@ -235,6 +248,142 @@ string decodeDNAStr(string inputStr) {
     return outStr;
 }
 
+
+string decodeDNAStrWithOption(string inputStr, int nHomopoly) {
+    
+    bool evenTurn = true;
+    int strideCount = 2 * nHomopoly + 1;
+    int midIndex = strideCount/2; 
+    int j = 0, k = 0, g = 0, h = 0;
+    char lChar, mChar, rChar, eChar;
+    string outStr = "", substrTemp = "";
+    
+    for (int i=0, m=strideCount; m <= inputStr.length();  
+                i+=strideCount+1, m+=strideCount+1) {
+        
+        j = convertNTtoInt(inputStr[m-1]);
+        k = convertNTtoInt(inputStr[m+1]);
+
+        substrTemp = inputStr.substr(i, strideCount+1);
+        
+        lChar = substrTemp[midIndex-1];
+        mChar = substrTemp[midIndex];
+        rChar = substrTemp[midIndex+1];
+        eChar = substrTemp[strideCount];
+        
+        g = convertNTtoInt(lChar); 
+        h = convertNTtoInt(rChar);
+
+        substrTemp = "";
+        if (evenTurn == true) {
+            
+            if (eChar == rightTable[j][k]) {
+                substrTemp += inputStr.substr(i, strideCount);
+            }
+            else if (leftTable[g][h] == mChar){
+                substrTemp += inputStr.substr(i, nHomopoly);
+                substrTemp += lChar;
+                substrTemp += inputStr.substr(i + nHomopoly + 1, nHomopoly);
+            }
+             else{
+                substrTemp += inputStr.substr(i, nHomopoly);
+                substrTemp += rChar;
+                substrTemp += inputStr.substr(i + nHomopoly + 1, nHomopoly);
+            }
+            evenTurn = false;
+        }
+        else {
+            
+            if (eChar == leftTable[j][k]) {
+                substrTemp += inputStr.substr(i, strideCount);
+            }
+            else if (leftTable[g][h] == mChar){
+                substrTemp += inputStr.substr(i, nHomopoly);
+                substrTemp += lChar;
+                substrTemp += inputStr.substr(i + nHomopoly + 1, nHomopoly);
+            }
+             else{
+                substrTemp += inputStr.substr(i, nHomopoly);
+                substrTemp += rChar;
+                substrTemp += inputStr.substr(i + nHomopoly + 1, nHomopoly);
+            }
+            evenTurn = true;
+        }
+        outStr += substrTemp;
+        substrTemp = "";
+    }
+    return outStr;
+}
+
+string encodeDNAStrWithOption(string inputStr, int nHomopoly) {
+    
+    bool evenTurn = true;
+    int strideCount = 2 * nHomopoly + 1;
+    int midIndex = strideCount/2; 
+    int j = 0, k = 0, g = 0, h = 0;
+    char lChar, rChar, mChar;
+    string outStr = "", substrTemp = "";
+    
+    for (int i=0, m=strideCount-1; m <= inputStr.length();  
+                        i+=strideCount, m+=strideCount) {
+        
+        j = convertNTtoInt(inputStr[m]);
+        k = convertNTtoInt(inputStr[m+1]);
+
+        substrTemp = inputStr.substr(i, strideCount);
+        
+        lChar = substrTemp[midIndex-1];
+        mChar = substrTemp[midIndex];
+        rChar = substrTemp[midIndex+1];
+        
+        g = convertNTtoInt(lChar); 
+        h = convertNTtoInt(rChar);
+
+        substrTemp = "";
+        if (evenTurn == true) {
+            if (lChar == mChar) {
+                substrTemp += inputStr.substr(i, nHomopoly); 
+                substrTemp += leftTable[g][h];
+                substrTemp += inputStr.substr(i + nHomopoly + 1, nHomopoly);
+                substrTemp += leftTable [j][k];
+            }
+            else if (mChar == rChar){
+                substrTemp += inputStr.substr(i, nHomopoly); 
+                substrTemp += rightTable[g][h];
+                substrTemp += inputStr.substr(i + nHomopoly + 1, nHomopoly);
+                substrTemp += leftTable [j][k];
+            }
+             else{
+                substrTemp += inputStr.substr(i, strideCount);
+                substrTemp += rightTable[j][k];   
+            }
+            evenTurn = false;
+        }
+        else {
+            if (lChar == mChar) {
+                substrTemp += inputStr.substr(i, nHomopoly);  
+                substrTemp += leftTable[g][h];
+                substrTemp += inputStr.substr(i + nHomopoly + 1, nHomopoly);
+                substrTemp += rightTable [j][k];
+            }
+            else if (mChar == rChar) {
+                substrTemp += inputStr.substr(i, nHomopoly);  
+                substrTemp += rightTable[g][h];
+                substrTemp += inputStr.substr(i + nHomopoly + 1, nHomopoly);
+                substrTemp += rightTable [j][k];
+            }
+            else {
+                substrTemp += inputStr.substr(i, strideCount);
+                substrTemp += leftTable[j][k]; 
+            }
+            evenTurn = true;
+        }
+        outStr += substrTemp;
+        substrTemp = "";
+    }
+    return outStr;
+}
+
 string encodeDNAStr(string inputStr) {
     
     bool evenTurn = true;
@@ -301,17 +450,32 @@ string encodeDNAStr(string inputStr) {
     return outStr;
 }
 
-bool checkHomopolymers(string encodeDNAStr, int subSeqeunceLength)
+bool checkHomopolymers(string encodeDNAStr, int homopoly)
 {
-    bool homopolymers = false;
-    for (int i = 0 ; i < encodeDNAStr.length()-subSeqeunceLength ; i++)
+    int maxHomopoly = 1, newHomopoly = 1;
+    for (int i = 0 ; i < encodeDNAStr.length()-1 ; i++)
     {
         if ((encodeDNAStr[i] == encodeDNAStr[i+1]))
         {
-            homopolymers = true;
+            newHomopoly = newHomopoly + 1;
+        }
+        else
+        {
+            if (maxHomopoly < newHomopoly)
+            {
+                 maxHomopoly = newHomopoly;
+            }
+            newHomopoly = 1;
         }
     } 
-    return false;
+    if (maxHomopoly == homopoly)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 string inputBinaryStrGen(int strSize)
@@ -338,17 +502,17 @@ bool checkEncodeDecode(string inputDNAStr, string decodeOutStr)
 
 void printMatrixGCContent(int * matrixGCcontent, int parts, int totalLen)
 {
-    cout << "\n ================= GC Content =====================";
+    cout << "\n================= GC Content =====================";
     for (int j = 0; j < parts; j++)
     {
         cout << "\nPart." << j+1 << ".GC Content:" << (matrixGCcontent[j]*100)/(totalLen/parts) << "%";
     }
-    cout << "\n ================= GC Content =====================";
+    cout << "\n================= GC Content =====================";
 }
 
 void printMatrixGCVariance(int ** matrixSubSeq, int subSeqeunceLength)
 {
-    cout << "\n ================= GC Variation =====================";
+    cout << "\n================= GC Variation =====================";
     int count = 0, flag = 0;
     int martixLen = pow(4, subSeqeunceLength);
     int *matrixSubSeqCol = new int[martixLen];
@@ -369,7 +533,6 @@ void printMatrixGCVariance(int ** matrixSubSeq, int subSeqeunceLength)
         else
             matrixSubSeqRow[j] = 0;
     } 
-    
     for (int j = 0 ; j < martixLen; j++)
     {
         flag = 0;
@@ -385,8 +548,6 @@ void printMatrixGCVariance(int ** matrixSubSeq, int subSeqeunceLength)
         else
             matrixSubSeqCol[j] = 0;
     }
-    
-    
     cout << "\n";
     for (int j = 0 ; j < martixLen; j++)
     {
@@ -395,7 +556,6 @@ void printMatrixGCVariance(int ** matrixSubSeq, int subSeqeunceLength)
             cout << "," << "\"" <<convertIdxtoNTStr(j) << "\"";
         }
     }
-    
     cout << "\n[";
     for (int j = 0 ; j < martixLen; j++)
     {
@@ -425,22 +585,24 @@ void printMatrixGCVariance(int ** matrixSubSeq, int subSeqeunceLength)
         }
     }
     cout << "]";
-    cout << "\n ================= GC Variation =====================";
+    cout << "\n================= GC Variation =====================";
 }
 
 void mainPrint(bool printFlag , int indNo, string outStr)
 {
     switch(indNo)
     {
-        case 0: if (printFlag) cout << "\nInput DNA String:" << outStr; 
+        case 0: if (printFlag) cout << "\nString Length :" << outStr.length(); 
         break;
-        case 1: if (printFlag) cout << "\nEncoded String:" << outStr; 
+        case 1: if (printFlag) cout << "\nInput   String:" << outStr; 
         break;
-        case 2: if (printFlag) cout << "\nDecoded String:" << outStr; 
+        case 2: if (printFlag) cout << "\nEncoded String:" << outStr; 
         break;
-        case 3: if (printFlag) cout << "\nEncoding-Decoding Correctness:" << outStr;
+        case 3: if (printFlag) cout << "\nDecoded String:" << outStr; 
         break;
-        case 4: if (printFlag) cout << "\nHomopolymers don't exit:" << outStr; 
+        case 4: if (printFlag) cout << "\nDecoded Correctly:" << outStr;
+        break;
+        case 5: if (printFlag) cout << "\nHomopolymers are fine:" << outStr; 
         break;
         default: if (printFlag) cout << "\nProgram Completed:" << outStr; 
     }
@@ -449,9 +611,9 @@ void mainPrint(bool printFlag , int indNo, string outStr)
 int main()
 {
     // input binary string length
-    int strSize = 15000, contentGCParts=10, subSeqeunceLength=4;
+    int strSize = 315, contentGCParts=1, subSeqLen=4, homopoly=1;
     // enable or disable all the console printing
-    bool printAll = false;
+    bool printAll = true;
     
     //generate a random input binary string of given length
     string inputStr = inputBinaryStrGen(strSize);
@@ -460,23 +622,26 @@ int main()
     string inputDNAStr = convertIntoDNAStr(inputStr);
     
     //Encode the DNA sequence using our proposed method
-    string encodeOutStr = encodeDNAStr(inputDNAStr);
+    string encodeOutStr = encodeDNAStrWithOption(inputDNAStr,homopoly);
     
     //Conversely, Decoding is performed below 
-    string decodeOutStr = decodeDNAStr(encodeOutStr);
+    string decodeOutStr = decodeDNAStrWithOption(encodeOutStr,homopoly);
 
    
     int * matrixGCcontent = calcPercentGC(encodeOutStr, contentGCParts);
-    int ** martixGCVariance = calcVarianceGC(encodeOutStr, subSeqeunceLength);
+    int ** martixGCVariance = calcVarianceGC(encodeOutStr, subSeqLen);
    
-    // printing could be performed using the below lines of code, disable indivitual printing using fasle instead.
-    mainPrint(printAll && true , 0 , inputDNAStr);
-    mainPrint(printAll && true , 1 , encodeOutStr);
-    mainPrint(printAll && true , 2 , decodeOutStr);
-    mainPrint(printAll && true , 3 , (checkEncodeDecode(inputDNAStr, decodeOutStr) == 0 ? "OK.": "Not Ok."));
-    mainPrint(printAll && true , 4 , (checkHomopolymers(encodeOutStr, subSeqeunceLength) == 0 ? "OK.": "Not Ok."));
-    //printMatrixGCContent(matrixGCcontent, contentGCParts, encodeOutStr.length());
-    printMatrixGCVariance(martixGCVariance, subSeqeunceLength);
+    // printing could be performed using the below lines of code, 
+    // disable indivitual printing using false instead.
+    mainPrint(printAll && true,  0 , inputDNAStr);
+    mainPrint(printAll && true,  0 , encodeOutStr);
+    mainPrint(printAll && false, 2 , encodeOutStr);
+    mainPrint(printAll && false, 1 , inputDNAStr);
+    mainPrint(printAll && false, 3 , decodeOutStr);
+    mainPrint(printAll && true , 4 , (checkEncodeDecode(inputDNAStr, decodeOutStr) == 0 ? "YES": "OH! NO"));
+    mainPrint(printAll && true , 5 , (checkHomopolymers(encodeOutStr, homopoly) == true? "YES": "OH! NO"));
+    printMatrixGCContent(matrixGCcontent, contentGCParts, encodeOutStr.length());
+    //printMatrixGCVariance(martixGCVariance, subSeqLen);
     mainPrint(true && true , 6 , "Done!");
         
     return 0;

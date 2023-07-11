@@ -1,6 +1,6 @@
 /******************************************************************************
 
-                    C++ Code written by Asad Usmani on 09/06/2023
+                    C++ Code written by Asad Usmani on 25/11/2021
 		      A novel DNA encoding and decoding scheme
 
 *******************************************************************************/
@@ -19,26 +19,26 @@ char convertDNATable[4][4] = {  {'A', 'T', 'C', 'G'},
                                 {'G', 'A', 'T', 'C'}
                             };
          
-char rightTable[4][4]   =   {  {'C', 'C', 'T', 'C'},
-                                {'C', 'C', 'G', 'A'},
-                                {'T', 'G', 'T', 'A'},
-                                {'C', 'A', 'A', 'T'}
+char rightTable1[4][4]   =   {  {'G', 'G', 'G', 'C'},
+                                {'G', 'G', 'G', 'C'},
+                                {'G', 'G', 'G', 'T'},
+                                {'C', 'C', 'T', 'C'}
                             };
                             
-char leftTable[4][4]    =   {  {'G', 'G', 'G', 'T'},
-                                {'G', 'G', 'A', 'C'},
-                                {'G', 'A', 'A', 'T'},
-                                {'T', 'C', 'T', 'A'}
+char leftTable1[4][4]    =   {  {'C', 'C', 'T', 'T'},
+                                {'C', 'C', 'A', 'T'},
+                                {'A', 'A', 'A', 'A'},
+                                {'T', 'T', 'A', 'A'}
                             };
     
                        
-char rightTable1[4][4]  =   {   {'T', 'C', 'T', 'C'},
+char rightTable[4][4]  =   {   {'T', 'C', 'T', 'C'},
                                 {'C', 'G', 'G', 'A'},
                                 {'T', 'G', 'T', 'A'},
                                 {'C', 'A', 'A', 'T'}
                             };
                             
-char leftTable1[4][4]   =   {   {'C', 'G', 'G', 'T'},
+char leftTable[4][4]   =   {   {'C', 'G', 'G', 'T'},
                                 {'G', 'A', 'A', 'C'},
                                 {'G', 'A', 'A', 'T'},
                                 {'T', 'C', 'T', 'A'}
@@ -450,7 +450,7 @@ string encodeDNAStr(string inputStr) {
     return outStr;
 }
 
-bool checkHomopolymers(string encodeDNAStr, int homopoly)
+int checkHomopolymers(string encodeDNAStr)
 {
     int maxHomopoly = 1, newHomopoly = 1;
     for (int i = 0 ; i < encodeDNAStr.length()-1 ; i++)
@@ -468,14 +468,7 @@ bool checkHomopolymers(string encodeDNAStr, int homopoly)
             newHomopoly = 1;
         }
     } 
-    if (maxHomopoly == homopoly)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    return maxHomopoly;
 }
 
 string inputBinaryStrGen(int strSize)
@@ -500,20 +493,67 @@ bool checkEncodeDecode(string inputDNAStr, string decodeOutStr)
     return inputDNAStr.compare(decodeOutStr);
 }
 
-void printMatrixGCContent(int * matrixGCcontent, int parts, int totalLen)
+
+bool checkHairPin(string subSeq, int stemLen, int loopLen)
 {
-    cout << "\n================= GC Content =====================";
-    for (int j = 0; j < parts; j++)
+    int totalLen = subSeq.length();
+    int countMatch = 0;
+    char leftNuct = ' ', rightNuct = ' ';
+    int endLen = totalLen - stemLen + 1;
+    char compNuct[4] = {'T', 'A', 'G', 'C'};
+    int leftEnd = totalLen/2 - loopLen/2 - 1 ;
+    int rightEnd = totalLen/2 + loopLen/2;
+    for (leftEnd; leftEnd >= 0;)
     {
-        cout << "\nPart." << j+1 << ".GC Content:" << (matrixGCcontent[j]*100)/(totalLen/parts) << "%";
+        leftNuct = compNuct[convertNTtoInt(subSeq[rightEnd])];
+        if ( subSeq[leftEnd] == leftNuct)
+        {
+            rightEnd = rightEnd + 1;
+            leftEnd = leftEnd - 1;
+            countMatch = countMatch + 1;
+        }
+        else if ( subSeq[leftEnd] == subSeq[rightEnd])
+        {
+            rightEnd = rightEnd + 1;
+            leftEnd = leftEnd - 1;
+        }
+        else
+        {
+            return false;
+        }
     }
-    cout << "\n================= GC Content =====================";
+    if (countMatch >= stemLen)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+int searchForHairPins(string inputStr, int lenSubSeq, int stemLen, int loopLen)
+{
+    int i = 0, j = 0, countHairPins = 0;
+    int endLen =  inputStr.length() - lenSubSeq + 1;
+    string subSeq;
+    for (i = 0 ; i < endLen; i++)
+    {
+        subSeq = inputStr.substr(i, lenSubSeq);
+        if (checkHairPin(subSeq, stemLen, loopLen) == true)
+        {
+            countHairPins = countHairPins + 1; 
+            cout << "\n" << subSeq;
+        }
+    }
+    return countHairPins;
 }
 
 void printMatrixGCVariance(int ** matrixSubSeq, int subSeqeunceLength)
 {
     cout << "\n================= GC Variation =====================";
-    int count = 0, flag = 0;
+    int count = 0, flag = 0, valCol = 0, valRow = 0;
+    int totalVal = 12;
     int martixLen = pow(4, subSeqeunceLength);
     int *matrixSubSeqCol = new int[martixLen];
     int *matrixSubSeqRow = new int[martixLen];
@@ -533,6 +573,7 @@ void printMatrixGCVariance(int ** matrixSubSeq, int subSeqeunceLength)
         else
             matrixSubSeqRow[j] = 0;
     } 
+    
     for (int j = 0 ; j < martixLen; j++)
     {
         flag = 0;
@@ -548,25 +589,35 @@ void printMatrixGCVariance(int ** matrixSubSeq, int subSeqeunceLength)
         else
             matrixSubSeqCol[j] = 0;
     }
+    
+    valCol = 0;
     cout << "\n";
-    for (int j = 0 ; j < martixLen; j++)
+    for (int j = 0 ; j < martixLen && valCol < totalVal*2; j++)
     {
         if (printFlag && matrixSubSeqRow[j] && (j%5 == 0)) 
         {
+            valCol = valCol + 1;
             cout << "," << "\"" <<convertIdxtoNTStr(j) << "\"";
+            if (valCol % totalVal == 0)
+                cout << "\n\n";
         }
     }
+    
+    valCol = 0;
+    valRow = 0;
     cout << "\n[";
     for (int j = 0 ; j < martixLen; j++)
     {
         if (printFlag && matrixSubSeqRow[j] && j%5 == 0) 
         {
             cout << "\n[";
+            valRow = 0;
             int flagTemp = 0;
             for (int k = 0 ; k < martixLen; k++)
             {
                 if (k%5 == 0)
                 {
+                    valRow = valRow + 1;
                     if ( matrixSubSeq[j][k] > 0)   
                     {
                         if (printFlag) cout << matrixSubSeq[j][k] << ",";
@@ -586,6 +637,16 @@ void printMatrixGCVariance(int ** matrixSubSeq, int subSeqeunceLength)
     }
     cout << "]";
     cout << "\n================= GC Variation =====================";
+}
+
+void printMatrixGCContent(int * matrixGCcontent, int parts, int totalLen)
+{
+    cout << "\n================= GC Content =====================";
+    for (int j = 0; j < parts; j++)
+    {
+        cout << "\nPart." << j+1 << ".GC Content:" << (matrixGCcontent[j]*100)/(totalLen/parts) << "%";
+    }
+    cout << "\n================= GC Content =====================";
 }
 
 void mainPrint(bool printFlag , int indNo, string outStr)
@@ -611,7 +672,7 @@ void mainPrint(bool printFlag , int indNo, string outStr)
 int main()
 {
     // input binary string length
-    int strSize = 315, contentGCParts=1, subSeqLen=4, homopoly=1;
+    int strSize = 18900, contentGCParts=10, subSeqLen=4, homopoly=2;
     // enable or disable all the console printing
     bool printAll = true;
     
@@ -627,20 +688,24 @@ int main()
     //Conversely, Decoding is performed below 
     string decodeOutStr = decodeDNAStrWithOption(encodeOutStr,homopoly);
 
+    
+    //Check for the Hairpins using our proposed method
+    int countHairPins = searchForHairPins(inputDNAStr, 20, 6, 6);
+    cout << "\nTotal Hairpins count:" << countHairPins << "\n";
    
     int * matrixGCcontent = calcPercentGC(encodeOutStr, contentGCParts);
     int ** martixGCVariance = calcVarianceGC(encodeOutStr, subSeqLen);
    
-    // printing could be performed using the below lines of code, 
-    // disable indivitual printing using false instead.
-    mainPrint(printAll && true,  0 , inputDNAStr);
-    mainPrint(printAll && true,  0 , encodeOutStr);
+    // printing could be performed using the below lines of code, disable indivitual printing using fasle instead.
+    mainPrint(printAll && true, 0 , inputDNAStr);
+    mainPrint(printAll && true, 0 , encodeOutStr);
     mainPrint(printAll && false, 2 , encodeOutStr);
     mainPrint(printAll && false, 1 , inputDNAStr);
     mainPrint(printAll && false, 3 , decodeOutStr);
     mainPrint(printAll && true , 4 , (checkEncodeDecode(inputDNAStr, decodeOutStr) == 0 ? "YES": "OH! NO"));
-    mainPrint(printAll && true , 5 , (checkHomopolymers(encodeOutStr, homopoly) == true? "YES": "OH! NO"));
-    printMatrixGCContent(matrixGCcontent, contentGCParts, encodeOutStr.length());
+    mainPrint(printAll && true , 5 , (checkHomopolymers(encodeOutStr) <= homopoly ? "YES": "OH! NO"));
+    //printMatrixGCContent(matrixGCcontent, contentGCParts, encodeOutStr.length());
+ 
     //printMatrixGCVariance(martixGCVariance, subSeqLen);
     mainPrint(true && true , 6 , "Done!");
         

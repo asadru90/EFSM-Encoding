@@ -1,6 +1,6 @@
 /******************************************************************************
 
-                    C++ Code written by Asad Usmani on 25/11/2021
+                    C++ Code written by Asad Usmani on 17/07/2023
 		      A novel DNA encoding and decoding scheme
 
 *******************************************************************************/

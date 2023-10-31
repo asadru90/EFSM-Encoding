@@ -675,6 +675,7 @@ int main()
     int strSize = 18900, contentGCParts=10, subSeqLen=4, homopoly=2;
     // enable or disable all the console printing
     bool printAll = true;
+    int strandSize = 945;
     
     //generate a random input binary string of given length
     string inputStr = inputBinaryStrGen(strSize);
@@ -688,10 +689,17 @@ int main()
     //Conversely, Decoding is performed below 
     string decodeOutStr = decodeDNAStrWithOption(encodeOutStr,homopoly);
 
-    
+    int countHairPins = 0, countTotalHairPins = 0;
     //Check for the Hairpins using our proposed method
-    int countHairPins = searchForHairPins(inputDNAStr, 20, 6, 6);
-    cout << "\nTotal Hairpins count:" << countHairPins << "\n";
+    for (int i = 0 ; i < inputDNAStr.length(); i = i + strandSize)
+    {
+        string subSeq = inputDNAStr.substr(i, strandSize);
+        countTotalHairPins+=searchForHairPins(subSeq, 20, 6, 6);
+        if (searchForHairPins(subSeq, 20, 6, 6)>0)
+            countHairPins += 1;
+    }
+    cout << "\nHairpins count:" << countHairPins << "\n";
+    cout << "\nTotal Hairpins count:" << countTotalHairPins << "\n";
    
     int * matrixGCcontent = calcPercentGC(encodeOutStr, contentGCParts);
     int ** martixGCVariance = calcVarianceGC(encodeOutStr, subSeqLen);

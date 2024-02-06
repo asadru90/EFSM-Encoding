@@ -94,26 +94,68 @@ char convertInttoNT(int inIdx) {
     return outNt;
 }
 
-string convertBinarytoDNAStr(string bitStr)
+string convertBinarytoDNAStr(string bitStr, int homopoly, int percent)
 {
+    bool flag = true;
     string outDNAStr = "";
     string temp = "";
-    if (bitStr.length() % 2 != 0)
+    int bitLen = bitStr.length();
+    int perBound = (bitLen * percent) / 100;
+    cout << perBound << " " << bitLen;
+    while (bitLen % homopoly != 0)
     {
         bitStr += '0';
+        bitLen = bitStr.length();
     }
-    for (int j = 0; j < bitStr.length(); j += 2)
+    for (int j = 0; j < bitLen; j += 2)
     {
-        temp = bitStr[j];
-        temp = temp + bitStr[j + 1];
-        if (temp == "00")
-            outDNAStr += "A";
-        else if (temp == "01")
-            outDNAStr += "A";
-        else if (temp == "10")
-            outDNAStr += "T";
-        else if (temp == "11")
-            outDNAStr += "G";
+        if (j > perBound)
+        {
+            flag = false;
+        }
+
+        if (flag == true)
+        {
+            temp = bitStr[j];
+            temp = temp + bitStr[j + 1];
+            if (temp == "00")
+                outDNAStr += "A";
+            else if (temp == "01")
+                outDNAStr += "T";
+            else if (temp == "10")
+                outDNAStr += "G";
+            else if (temp == "11")
+                outDNAStr += "C";
+        }
+        else
+        {
+            if (percent > 50)
+            {
+                temp = bitStr[j];
+                temp = temp + bitStr[j + 1];
+                if (temp == "00")
+                    outDNAStr += "A";
+                else if (temp == "01")
+                    outDNAStr += "T";
+                else if (temp == "10")
+                    outDNAStr += "G";
+                else if (temp == "11")
+                    outDNAStr += "A";
+            }
+            else
+            {
+                temp = bitStr[j];
+                temp = temp + bitStr[j + 1];
+                if (temp == "00")
+                    outDNAStr += "G";
+                else if (temp == "01")
+                    outDNAStr += "C";
+                else if (temp == "10")
+                    outDNAStr += "G";
+                else if (temp == "11")
+                    outDNAStr += "A";
+            }
+        }
     }
     if (outDNAStr.length() % 3 == 1)
     {
@@ -774,7 +816,7 @@ int main()
         bool printAll = true;
 
         // input binary string length
-        int strSize = 0, strandSize = 0;
+        int strSize = 0, strandSize = 0, percent = 90;
 
         // Enter the length of the homopoly
         int contentGCParts = 1, subSeqLen = 4, homopoly = 3;
@@ -787,7 +829,7 @@ int main()
         {
             serialNo += 1;
             //generate DNA seqeunce from input binary string
-            string inputDNAStr = convertBinarytoDNAStr(inputStr);
+            string inputDNAStr = convertBinarytoDNAStr(inputStr, homopoly, percent);
 
             //Encode the DNA sequence using our proposed method
             string encodeOutStr = encodeDNAStrWithOption(inputDNAStr, homopoly);

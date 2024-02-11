@@ -14,35 +14,40 @@
 using namespace std;
 int printFlag = 1;
 
-char convertDNATable[4][4] = { {'A', 'T', 'C', 'G'},
-                                {'T', 'C', 'G', 'A'},
-                                {'C', 'G', 'A', 'T'},
-                                {'G', 'A', 'T', 'C'}
+char convertDNATable[4][4] = { 
+    {'A', 'T', 'C', 'G'},
+    {'T', 'C', 'G', 'A'},
+    {'C', 'G', 'A', 'T'},
+    {'G', 'A', 'T', 'C'}
 };
 
-char rightTable1[4][4] = { {'G', 'G', 'G', 'C'},
-                                {'G', 'G', 'G', 'C'},
-                                {'G', 'G', 'G', 'T'},
-                                {'C', 'C', 'T', 'C'}
+char rightTable1[4][4] = { 
+    {'G', 'G', 'G', 'C'},
+    {'G', 'G', 'G', 'C'},
+    {'G', 'G', 'G', 'T'},
+    {'C', 'C', 'T', 'C'}
 };
 
-char leftTable1[4][4] = { {'C', 'C', 'T', 'T'},
-                                {'C', 'C', 'A', 'T'},
-                                {'A', 'A', 'A', 'A'},
-                                {'T', 'T', 'A', 'A'}
+char leftTable1[4][4] = { 
+    {'C', 'C', 'T', 'T'},
+    {'C', 'C', 'A', 'T'},
+    {'A', 'A', 'A', 'A'},
+    {'T', 'T', 'A', 'A'}
 };
 
-
-char rightTable[4][4] = { {'T', 'C', 'T', 'C'},
-                                {'C', 'G', 'G', 'A'},
-                                {'T', 'G', 'T', 'A'},
-                                {'C', 'A', 'A', 'T'}
+char rightTable[4][4] = {
+    {'T', 'C', 'T', 'C'},
+    {'C', 'G', 'G', 'A'},
+    {'T', 'G', 'T', 'A'},
+    {'C', 'A', 'A', 'T'}
 };
+   
 
-char leftTable[4][4] = { {'C', 'G', 'G', 'T'},
-                                {'G', 'A', 'A', 'C'},
-                                {'G', 'A', 'A', 'T'},
-                                {'T', 'C', 'T', 'A'}
+char leftTable[4][4] = { 
+    {'C', 'G', 'G', 'T'},
+    {'G', 'A', 'A', 'C'},
+    {'G', 'A', 'A', 'T'},
+    {'T', 'C', 'T', 'A'}
 };
 
 
@@ -96,74 +101,53 @@ char convertInttoNT(int inIdx) {
 
 string convertBinarytoDNAStr(string bitStr, int homopoly, int percent)
 {
-    bool flag = true;
+    int j = 0;
+    bool flag = false;
     string outDNAStr = "";
     string temp = "";
     int bitLen = bitStr.length();
-    int perBound = (bitLen * percent) / 100;
-    cout << perBound << " " << bitLen;
-    while (bitLen % homopoly != 0)
+    if (percent > 50)
     {
-        bitStr += '0';
-        bitLen = bitStr.length();
+        flag = true;
+        percent = 100 - percent;
     }
-    for (int j = 0; j < bitLen; j += 2)
-    {
-        if (j > perBound)
-        {
-            flag = false;
-        }
+    int perBound = (20 * percent) / 100 + 1;
 
-        if (flag == true)
+    for (j = 0; j < bitLen; j += 2)
+    {
+        temp = bitStr[j];
+        temp = temp + bitStr[j + 1];
+        if (temp == "00")
+            outDNAStr += 'A';
+        else if (temp == "01")
+            outDNAStr += 'G';
+        else if (temp == "10")
+            outDNAStr += 'T';
+        else if (temp == "11")
+            outDNAStr += 'C';
+    }
+    bitLen = outDNAStr.length();
+    if (flag == true)
+    {
+        for (j = 0; j < bitLen; j += 1)
         {
-            temp = bitStr[j];
-            temp = temp + bitStr[j + 1];
-            if (temp == "00")
-                outDNAStr += "A";
-            else if (temp == "01")
-                outDNAStr += "T";
-            else if (temp == "10")
-                outDNAStr += "G";
-            else if (temp == "11")
-                outDNAStr += "C";
-        }
-        else
-        {
-            if (percent > 50)
-            {
-                temp = bitStr[j];
-                temp = temp + bitStr[j + 1];
-                if (temp == "00")
-                    outDNAStr += "A";
-                else if (temp == "01")
-                    outDNAStr += "T";
-                else if (temp == "10")
-                    outDNAStr += "G";
-                else if (temp == "11")
-                    outDNAStr += "A";
-            }
-            else
-            {
-                temp = bitStr[j];
-                temp = temp + bitStr[j + 1];
-                if (temp == "00")
-                    outDNAStr += "G";
-                else if (temp == "01")
-                    outDNAStr += "C";
-                else if (temp == "10")
-                    outDNAStr += "G";
-                else if (temp == "11")
-                    outDNAStr += "A";
-            }
+            if (j % perBound == 0)
+                outDNAStr[j] = 'G';
         }
     }
-    if (outDNAStr.length() % 3 == 1)
+    else
     {
-        outDNAStr += "AA";
+        for (j = 0; j < bitLen; j += 1)
+        {
+            if (j % perBound == 0)
+                outDNAStr[j] = 'A';
+        }
     }
-    else if (outDNAStr.length() % 3 == 2)
+    
+    while (bitLen % (homopoly*2+1) != 0)
     {
-        outDNAStr += "A";
+        outDNAStr += 'G';
+        bitLen = outDNAStr.length();
     }
     return outDNAStr;
 }
@@ -716,11 +700,55 @@ void printMatrixGCVariance(int** matrixSubSeq, int subSeqeunceLength)
     cout << "\n================= GC Variation =====================";
 }
 
-void printMatrixGCContent(int* matrixGCcontent, int parts, int totalLen)
+void writeToFile(int percentGC, int encoded, int homopoly)
+{
+    string filePath = "D:\\PhDGoetheUni\\Works\\PhD_Work\\3.Encoding_Method_Paper\\Results\\DNAEncodingResults\\";
+    string fileName = filePath + "filename_GContent_";
+    if (homopoly == 0)
+        fileName += "O.csv";
+    else if (homopoly == 1)
+        fileName += "1.csv";
+    else if (homopoly == 2)
+        fileName += "2.csv";
+    else if (homopoly == 3)
+        fileName += "3.csv";
+    else if (homopoly == 4)
+        fileName += "4.csv";
+    else
+        fileName += "5.csv";
+    fstream myFile(fileName, ios_base::app);
+    // Create and open a text file
+    if (myFile.is_open())
+    {
+        myFile << endl << percentGC ;
+        myFile.close();
+    }
+    else cerr << "Unable to open file";
+}
+
+void printMatrixGCContent(int* matrixGCcontent, int parts, int totalLen, int homopoly, bool encoded)
 {
     for (int j = 0; j < parts; j++)
     {
-        cout << "\nPart." << j + 1 << ".GC Content:" << (matrixGCcontent[j] * 100) / (totalLen / parts) << "%";
+        int percentGC = (matrixGCcontent[j] * 100) / (totalLen / parts);
+        if (encoded == true)
+        {
+            cout << "\n Encoded String: " << percentGC << "%";
+        }
+        else
+        {
+            cout << "\n Original String: " << percentGC << "%";
+            if (homopoly <= 1)
+                homopoly = 0;
+            else
+                homopoly = 5;
+        }
+
+        if (encoded and (percentGC > 60 or percentGC < 40))
+        {
+            cout << " and Out of range!";
+        }
+        writeToFile(percentGC, encoded, homopoly);
     }
 }
 
@@ -787,67 +815,136 @@ void printResutls(bool printAll,
     mainPrint(printAll && false, 3, decodeOutStr);
     mainPrint(printAll && true, 4, (checkEncodeDecode(inputDNAStr, decodeOutStr) == 0 ? "YES" : "OH! NO"));
     mainPrint(printAll && true, 5, (checkHomopolymers(encodeOutStr) <= homopoly ? "YES" : "OH! NO"));
-    mainPrint(printAll && true, 6, "Done!");
-    cout << "\nInput and Encoded String lengths:" << inputDNAStr.length()  
-        << " and " << encodeOutStr.length();
-    cout << "\nInformation Density:" << infoDensity << "and homopoly:" << homopoly;
-
+    mainPrint(printAll && false, 6, "Done!");
+    //cout << "\nInput and Encoded String lengths:" << inputDNAStr.length()
+    // << " and " << encodeOutStr.length();
+    
+    cout << "\nInformation Density: " << infoDensity << "  and homopoly:" << homopoly;
     // Calculate the GC content parts of the input string
     //int** martixGCVariance = calcVarianceGC(encodeOutStr, subSeqLen);
     
     int* matrixGCcontent = calcPercentGC(inputDNAStr, contentGCParts);
-    printMatrixGCContent(matrixGCcontent, contentGCParts, inputDNAStr.length());
+    printMatrixGCContent(matrixGCcontent, contentGCParts, inputDNAStr.length(), homopoly, false);
 
     // Calculate the GC content parts of the DNA endcoded string
     matrixGCcontent = calcPercentGC(encodeOutStr, contentGCParts);
-    printMatrixGCContent(matrixGCcontent, contentGCParts, encodeOutStr.length());
+    printMatrixGCContent(matrixGCcontent, contentGCParts, encodeOutStr.length(), homopoly, true);
+
     cout << "\n==================================================";
 
 }
 
+void clearAllFiles(string filePath, int strLen)
+{
+    string fileName = filePath + "filename_GContent_O.csv";
+    cout << fileName;
+    ofstream myFile1(fileName, ios::trunc);
+    if (myFile1.is_open())
+    {
+        myFile1 << "Sequence Length:" << strLen;
+        myFile1.close();
+    }
+    else cout << "File opening error!";
+    fileName = filePath + "filename_GContent_1.csv";
+    ofstream myFile2(fileName);
+    if (myFile2.is_open())
+    {
+        myFile2 << "Sequence Length:" << strLen;
+        myFile2.close();
+    }
+    fileName = filePath + "filename_GContent_2.csv";
+    ofstream myFile3(fileName);
+    if (myFile3.is_open())
+    {
+        myFile3 << "Sequence Length:" << strLen;
+        myFile3.close();
+    }
+    fileName = filePath + "filename_GContent_3.csv";
+    ofstream myFile4(fileName);
+    if (myFile4.is_open())
+    {
+        myFile4 << "Sequence Length:" << strLen;
+        myFile4.close();
+    }
+    fileName = filePath + "filename_GContent_4.csv";
+    ofstream myFile5(fileName);
+    if (myFile5.is_open())
+    {
+        myFile5 << "Sequence Length:" << strLen;
+        myFile5.close();
+    }
+    fileName = filePath + "filename_GContent_5.csv";
+    ofstream myFile6(fileName);
+    if (myFile6.is_open())
+    {
+        myFile6 << "Sequence Length:" << strLen;
+        myFile6.close();
+    }
+
+}
 int main()
 {
     int p = 0;
-    string FILENAME = "C:\\Users\\admin\\Desktop\\EncodingMethod\\BinaryCodeDataset1_250_32000.txt";
-    fstream myfile(FILENAME);
-    if (myfile.is_open())
+    string filePath = "D:\\PhDGoetheUni\\Works\\PhD_Work\\3.Encoding_Method_Paper\\Results\\DNAEncodingResults\\";
+    string fileName = filePath + "BinaryCodeDataset1_250_32000.txt";
+    clearAllFiles(filePath, 16385);
+    fstream myFile(fileName);
+    if (myFile.is_open())
     {
         // Chose the printing flag status
         bool printAll = true;
 
+        string inputStr = "", tempStr = "01";
+
         // input binary string length
-        int strSize = 0, strandSize = 0, percent = 90;
+        int strSize = 0, strandSize = 945, serialNo = 0, noOfInstances=250;
 
         // Enter the length of the homopoly
-        int contentGCParts = 1, subSeqLen = 4, homopoly = 3;
+        int contGCParts = 1, subSeqLen = 4, homopoly = 1, range = 80, base = 10;
 
-        //generate a random input binary string of given length
-        
-        string inputStr = "";
-        int serialNo = 0;
-        while (getline(myfile, inputStr) and serialNo < 10)
+        int* randPercent = new int[noOfInstances];
+
+        for (int k = 0; k < noOfInstances; k++)
         {
-            serialNo += 1;
-            //generate DNA seqeunce from input binary string
-            string inputDNAStr = convertBinarytoDNAStr(inputStr, homopoly, percent);
-
-            //Encode the DNA sequence using our proposed method
-            string encodeOutStr = encodeDNAStrWithOption(inputDNAStr, homopoly);
-
-            //Conversely, Decoding is performed below 
-            string decodeOutStr = decodeDNAStrWithOption(encodeOutStr, homopoly);
-
-            printResutls(
-                printAll, 
-                inputDNAStr, 
-                encodeOutStr,
-                decodeOutStr,
-                homopoly,
-                subSeqLen,
-                contentGCParts, 
-                serialNo);
+            randPercent[k] = (rand() % range) + base;
         }
-        myfile.close();
+        while (getline(myFile, inputStr) and serialNo < noOfInstances)
+        {
+            
+            while (inputStr.length() % strandSize != 0)
+            {   
+                inputStr += tempStr[rand() % 2];
+            }
+            
+            homopoly = 1;
+            string inputDNAStr = convertBinarytoDNAStr(inputStr, homopoly, randPercent[serialNo++]);
+
+            while (homopoly < 5)
+            {
+                //Encode the DNA sequence using our proposed method
+
+                string encodeOutStr = encodeDNAStrWithOption(inputDNAStr, homopoly);
+
+                //Conversely, Decoding is performed below 
+                string decodeOutStr = decodeDNAStrWithOption(encodeOutStr, homopoly);
+
+                cout << "\nLength of the string:" << inputDNAStr.length();
+                cout << "\nLength of the string:" << encodeOutStr.length();
+                printResutls(
+                    printAll,
+                    inputDNAStr,
+                    encodeOutStr,
+                    decodeOutStr,
+                    homopoly,
+                    subSeqLen,
+                    contGCParts,
+                    serialNo);
+
+                homopoly += 1;
+            }
+            
+        }
+        myFile.close();
 
     }
     else

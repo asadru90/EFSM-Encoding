@@ -665,53 +665,78 @@ string reverseStr(string inputStr, bool flag)
     string outStr = "", substrTemp = "";
     int i = 0, j = 0, g = 0, h = 0, endLen = inputStr.length();
    
+    /* Encoding loop */
     if (flag == true)
     {
-        for (i = 0; i < endLen-1; i += 1)
+        cout << "\n Input outStr  :" << inputStr << ",  Length:" << inputStr.length();
+        for (i = 1; i < endLen; i += 2)
         {
-            if (i % 2 == 1)
-            {
-                g = convertNTtoInt(inputStr[i]);
-                h = convertNTtoInt(inputStr[i + 2]);
+            g = convertNTtoInt(inputStr[i - 1]);
+            h = convertNTtoInt(inputStr[i + 1]);
 
-                outStr += inputStr.substr(i, 1);
-                outStr += rightTable[g][h];
-                i += 1;
-            }
-            else
+            if ((i + 2) >= endLen)
             {
-                outStr += inputStr.substr(i, 1);
+                outStr += rightTable[g][h];
+            }
+            else if (i % 2 == 1)
+            {
+                if (rightTable[g][h] == inputStr[i])
+                {
+                    outStr += leftTable[g][h];
+                }
+                else
+                {
+                    outStr += rightTable[g][h];
+                }
+                outStr += inputStr.substr(i + 1, 1);
             }
         }
-    }
+        
+        cout << "\n Reverse outStr:" << outStr << ",  Length:" << outStr.length();
+    } 
+    /* Dencoding loop */
     else
     {
-        for (i = 0; i < endLen-1; i += 1)
+        cout << "\n Input outStr  :" << inputStr << ",  Length:" << inputStr.length();
+        for (i = 1; i < endLen; i += 2)
         {
-            if (i % 2 == 1)
-            {
-                g = convertNTtoInt(inputStr[i]);
-                h = convertNTtoInt(inputStr[i + 2]);
+            g = convertNTtoInt(inputStr[i - 1]);
+            h = convertNTtoInt(inputStr[i + 1]);
 
-                outStr += inputStr.substr(i, 1);
-                outStr += leftTable[g][h];
-                i += 1;
-            }
-            else
+            if ((i + 2) >= endLen)
             {
-                outStr += inputStr.substr(i, 1);
+                outStr += rightTable[g][h];
+            }
+            else if (i % 2 == 1)
+            {
+                if (rightTable[g][h] == inputStr[i])
+                {
+                    outStr += leftTable[g][h];
+                }
+                else
+                {
+                    outStr += rightTable[g][h];
+                }
+                outStr += inputStr.substr(i + 1, 1);
             }
         }
+
+        cout << "\n Reverse outStr:" << outStr << ",  Length:" << outStr.length();
     }
     return outStr;
 }
 
 string encodeDNAStrWithExtendedVersion(string inputStr, int nHairpinSeq) {
+    
     char lChar = ' ', rChar = ' ', mChar = ' ';
     string outStr = "", substrTemp = "";
-    int i = 0, g = 0, h = 0, j = nHairpinSeq / 2 - 1, 
+    int i = 0, g = 0, h = 0, k = 0, j = nHairpinSeq / 2 - 1, 
         endLen = inputStr.length() - nHairpinSeq / 2 + 1;
     bool flag = true;
+
+    cout << "\nEnter Encoding: " << " InputStr:" << inputStr << ",  Length:" << inputStr.length();
+    inputStr += "A";
+ 
     for (i = 0; i <= endLen; i += j)   
     {
         g = convertNTtoInt(inputStr[i + j - 1]);
@@ -719,27 +744,32 @@ string encodeDNAStrWithExtendedVersion(string inputStr, int nHairpinSeq) {
 
         outStr += inputStr.substr(i, j);
         outStr += leftTable[g][h];
+        substrTemp = inputStr.substr(i, j) + leftTable[g][h];
     }
 
-    inputStr = outStr;
+    k = i - j;
+    inputStr = "A" + outStr + inputStr.substr(k, endLen - k) + "A";
     outStr = "";
-    j = nHairpinSeq / 2 - 1;
-    endLen = inputStr.length() - nHairpinSeq / 2;
-    for (i = 0; i <= endLen; i += j)
+    j = nHairpinSeq / 2;
+    k = j + 1;
+    endLen = inputStr.length() - nHairpinSeq / 2 + 1;
+    substrTemp = "A";
+    
+    for (i = 1; i <= endLen; i += j)
     {
         if (flag == true)
         {
-            outStr += reverseStr(inputStr.substr(i, j + 2), true);
+            outStr += reverseStr(substrTemp + inputStr.substr(i, j + 1), true);
             flag = false;
         }
         else if (flag == false)
         {
-            outStr += inputStr.substr(i, j + 1);
+            outStr += inputStr.substr(i, j);
             flag = true;
         }
-        i += 1;
+        substrTemp = outStr.substr(outStr.length() - 1, 1);
     }
-   
+    cout << "\nExit Encoding: " << "\ExtendedOutStr:" << outStr << ",  Length:" << outStr.length();
     return outStr;
 }
 
@@ -1213,6 +1243,7 @@ int findHaipinSequence(string inputDNAStr, int strandSize,
             countTotalHairPins += hasStrand;
         }
     }
+    cout << "\nHarpin Sequences Count: " << countTotalHairPins;
     return countTotalHairPins;
 }
 
@@ -1415,36 +1446,44 @@ int main()
             {
                 if (homopoly == 1)
                 {
-                    inputDNAStr = "GCTGATCATGGATCAAGG";
+                    inputDNAStr = inputDNAStr.substr(0, 27);
 
-                    cout << "\nInput: \n" << inputDNAStr;
+                    cout << "\nInput:       " << inputDNAStr;
                     //Encode the DNA sequence using our proposed method
                     string encodeOutStr = encodeDNAStrWithOption(inputDNAStr, homopoly);
-                    cout << "\nEncoded: \n" << encodeOutStr;
+                    cout << "\nEncoded:     " << encodeOutStr;
 
                     encodeOutStr = encodeDNAStrWithExtendedVersion(encodeOutStr, subSeqLenForHairpin);
-                    cout << "\nExtended: \n" << encodeOutStr;
+                    cout << "\nExtended:    " << encodeOutStr;
 
                     //Conversely, Decoding is performed below 
                     
+                    return 0;
                     string decodeOutStr = decodeDNAStrWithExtendedVersion(encodeOutStr, subSeqLenForHairpin);
-                    cout << "\nDe-Extended: \n" << decodeOutStr;
+                    cout << "\nDe-Extended: " << decodeOutStr;
 
                     decodeOutStr = decodeDNAStrWithOption(decodeOutStr, homopoly);
-                    cout << "\nDecoded: \n" << decodeOutStr;
+                    cout << "\nDecoded:     " << decodeOutStr;
 
-                    return 0;
-
+                    if (encodeOutStr.compare(decodeOutStr) == 0)
+                    {
+                        cout << "\nSuccessfully decoded!";
+                    }
+                    else
+                    {
+                        cout << "\nOh!..Un-Successfull!";
+                    }
                     //cout << "\nLength of the string:" << inputDNAStr.length();
                     //cout << "\nLength of the string:" << encodeOutStr.length();
                     // 
                     hairpinCount = findHaipinSequence(encodeOutStr, strandSize, 20, 6, 6);
+                    /*
                     if (hairpinCount > 0)
                     {
                         cout << "\nHairpin: " << hairpinCount;
                         removeHairpinSequence(encodeOutStr, strandSize, 20, 6, 6);
                     }
-
+                    */
 
                     /*printResutls(
                         printAll,

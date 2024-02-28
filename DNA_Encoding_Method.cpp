@@ -674,68 +674,148 @@ string decodeDNAStrWithOption(string inputStr, int nHomopoly) {
     return outStr;
 }
 
-string reverseStr(string inputStr, bool flag)
+
+string halfConverseStr(string inputStr)
 {
-    char lChar = ' ', rChar = ' ', mChar = ' ';
-    string outStr = "", substrTemp = "";
-    int i = 0, j = 0, g = 0, h = 0, endLen = inputStr.length();
-   
-    /* Encoding loop */
-    if (flag == true)
-    {
-        for (i = 1; i < endLen; i += 2)
-        {
-            g = convertNTtoInt(inputStr[i - 1]);
-            h = convertNTtoInt(inputStr[i + 1]);
+    string outStr = "";
+    int i = 0, g = 0, h = 0, endLen = inputStr.length();
 
-            outStr += inputStr.substr(i - 1, 1);
-            if (rightTable[g][h] == inputStr[i])
-            {
-                outStr += leftTable[g][h];
-            }
-            else if (leftTable[g][h] == inputStr[i])
-            {
-                outStr += rightTable[g][h];
-            }
-            else
-            {
-                outStr += inputStr[i];
-            }
+    for (i = 1; i < endLen; i += 2)
+    {
+        g = convertNTtoInt(inputStr[i - 1]);
+        h = convertNTtoInt(inputStr[i + 1]);
+
+        outStr += inputStr.substr(i - 1, 1);
+        if (rightTable[g][h] == inputStr[i])
+        {
+            outStr += leftTable[g][h];
         }
-    } 
-    /* Decoding loop */
-    else
-    {
-        for (i = 1; i < endLen; i += 2)
+        else if (leftTable[g][h] == inputStr[i])
         {
-            g = convertNTtoInt(inputStr[i - 1]);
-            h = convertNTtoInt(inputStr[i + 1]);
-
-            outStr += inputStr.substr(i - 1, 1);
-            if (rightTable[g][h] == inputStr[i])
-            {
-                outStr += leftTable[g][h];
-            }
-            else if (leftTable[g][h] == inputStr[i])
-            {
-                outStr += rightTable[g][h];
-            }
-            else
-            {
-                outStr += inputStr[i];
-            }
+            outStr += rightTable[g][h];
+        }
+        else
+        {
+            outStr += inputStr[i];
         }
     }
+
     return outStr;
 }
 
-string encodeDNAStrWithExtendedVersion(string inputStr, int nHairpinSeq) {
+
+/* subSeqLen = 26, stemLen = 7 and loopLen = 6 */
+bool isAHairPin(string subSeq, int loopLen, int stemLen)
+{
+    char lNuc = ' ', rNuc = ' ';
+    char compNuc[4] = { 'T', 'A', 'G', 'C' };
+    int cntMatch = 0, subSeqLen = subSeq.length();
+    int leftEnd = (subSeqLen - loopLen) / 2 - 1;
+    int rightEnd = (subSeqLen + loopLen) / 2;
     
-    char lChar = ' ', rChar = ' ', mChar = ' ';
-    string outStr = "", substrTemp = "";
-    int i = 0, g = 0, h = 0, k = 0, j = nHairpinSeq - 1, 
-        endLen = inputStr.length() - nHairpinSeq + 1;
-    bool flag = true;
+    for (rightEnd; rightEnd < subSeqLen;)
+    {
+        lNuc = compNuc[convertNTtoInt(subSeq[rightEnd])];
+        
+        if (subSeq[leftEnd] == lNuc)
+        {
+            rightEnd = rightEnd + 1;
+            leftEnd = leftEnd - 1;
+            cntMatch = cntMatch + 1;
+        }
+        else if (subSeq[leftEnd] == subSeq[rightEnd])
+        {
+            rightEnd = rightEnd + 1;
+            leftEnd = leftEnd - 1;
+        }
+        else if (cntMatch >= stemLen)
+        {
+            return true;
+        }
+        else 
+        {
+            return false;
+        }
+    }
+    if (cntMatch >= stemLen)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+
+/* SubSeqLen = 26, stemLen = 7 and loopLen = 6 */
+int doHairPinExistsInSubSequence(string inputStr, int subSeqLen, int loopLen, int stemLen)
+{
+    string subSeqTemp = "";
+    int i = 0, j = 0, countHairPins = 0;
+    int endLen = inputStr.length() - subSeqLen + 1;
+    
+    for (i = 0; i < endLen; i++)
+    {
+        subSeqTemp = inputStr.substr(i, subSeqLen);
+        if (isAHairPin(subSeqTemp, loopLen, stemLen))
+        {
+            countHairPins++;
+        }
+    }
+    return countHairPins;
+}
+
+
+int doHairpinExistsInBlockSequence(string inputDNAStr, int blockSize, 
+    int subSeqLen, int loopLen, int stemLen)
+{
+    string subSeqTemp = "";
+    int countHairPins = 0, countTotalHairPins = 0;
+    bool hasHairPin = 0;
+
+    //Check for the Hairpins using our proposed method
+    for (int i = 0; i < inputDNAStr.length(); i = i + blockSize)
+    {
+        subSeqTemp = inputDNAStr.substr(i, blockSize);
+        countHairPins = doHairPinExistsInSubSequence(subSeqTemp,
+            subSeqLen, loopLen, stemLen);
+        countTotalHairPins += countHairPins;
+    }
+    cout << "\nTotal blocks:   " << inputDNAStr.length() / blockSize;
+    cout << "\nTotal hairpins: " << countTotalHairPins;
+    return countTotalHairPins;
+}
+
+string checkAndRemoveHairpins(string inputDNAStr, int blockSize,
+    int nBlocks, int subSeqLen, int loopLen, int stemLen)
+{
+    cout << "\n===================================================";
+    string outDNAStr = "";
+    if (nBlocks == 0)
+    {
+        cout << "\nSize of block:" << inputDNAStr.length() 
+            << ", Without Blocking : " << 
+            doHairPinExistsInSubSequence(inputDNAStr,
+            subSeqLen, loopLen, stemLen);
+    }
+    else
+    {
+        blockSize = blockSize * nBlocks;
+        cout << "\nSize of block (nucleotides):" << blockSize;
+        doHairpinExistsInBlockSequence(inputDNAStr, blockSize,
+            subSeqLen, loopLen, stemLen);
+    }
+    return outDNAStr;
+}
+
+
+string encodeDNAStrWithExtendedVersion(string inputStr, int blockSize) {
+   
+    string outStr = "", subStrBlock = "";
+    int i = 0, g = 0, h = 0, k = 0, j = blockSize - 1,
+        endLen = inputStr.length() - blockSize + 1;
+    bool isHairpinExists = true;
 
     for (i = 0; i < endLen; i += j)   
     {
@@ -744,78 +824,50 @@ string encodeDNAStrWithExtendedVersion(string inputStr, int nHairpinSeq) {
 
         outStr += inputStr.substr(i, j);
         outStr += leftTable[g][h];
-
-        substrTemp = inputStr.substr(i, j) + leftTable[g][h];
     }
     
-    k = i - j;
-    inputStr = outStr + inputStr.substr(i, endLen - k);
-    outStr = "";
-    j = nHairpinSeq;
-    endLen = inputStr.length() - nHairpinSeq + 1;
+    k = endLen - i - j;
+    outStr = outStr + inputStr.substr(i, k);
 
-    for (i = 0; i < endLen; i += j)
-    {
-        if (flag == true)
-        {
-            outStr += reverseStr(inputStr.substr(i, j + 1), true);
-            substrTemp = reverseStr(inputStr.substr(i, j + 1), true);
-            flag = false;
-        }
-        else if (flag == false)
-        {
-            outStr += inputStr.substr(i, j);
-            substrTemp = inputStr.substr(i, j);
-            flag = true;
-        }
-    }
-    
-    k = i - j;
-    inputStr = outStr + inputStr.substr(i, endLen - k);
-
-    return inputStr;    
+    return outStr;
 }
 
-string decodeDNAStrWithExtendedVersion(string inputStr, int nHairpinSeq) {
+string decodeDNAStrWithExtendedVersion(string inputStr, int blockSize) {
     
-    char lChar = ' ', rChar = ' ', mChar = ' ';
-    string outStr = "", substrTemp = "";
-    int i = 0, g = 0, h = 0, k = 0, j = nHairpinSeq,
-        endLen = inputStr.length() - nHairpinSeq + 1;
-    bool flag = true;
+    string outStr = "";
+    int i = 0, g = 0, h = 0, k = 0, j = blockSize,
+        endLen = inputStr.length() - blockSize + 1;
 
     for (i = 0; i < endLen; i += j)
     {
-        if (flag == true)
+        g = convertNTtoInt(inputStr[i + j - 2]);
+        h = convertNTtoInt(inputStr[i + j]);
+
+        if (inputStr[i + j - 1] == rightTable[g][h])
         {
-            outStr += reverseStr(inputStr.substr(i, j + 1), false);
-            substrTemp = reverseStr(inputStr.substr(i, j + 1), false);
-            flag = false;
+            outStr += halfConverseStr(inputStr.substr(i, j + 1));
         }
-        else if (flag == false)
+        else
         {
             outStr += inputStr.substr(i, j);
-            substrTemp = inputStr.substr(i, j);
-            flag = true;
         }
     }
     
-    k = i - j;
-    inputStr = outStr + inputStr.substr(i, endLen - k);
+    k = endLen - i - j;
+    inputStr = outStr + inputStr.substr(i, k);
     outStr = "";
-    j = nHairpinSeq - 1;
+    j = blockSize - 1;
 
     for (i = 0; i < endLen; i += j)
     {
         outStr += inputStr.substr(i, j);
         i += 1;
     }
+    outStr = outStr + inputStr.substr(i, k);
     
-    k = i - j;
-    inputStr = outStr + inputStr.substr(i, endLen - k);
-    
-    return inputStr;
+    return outStr;
 }
+
 
 string encodeDNAStrWithOption(string inputStr, int nHomopoly) {
 
@@ -1182,105 +1234,6 @@ void mainPrint(bool printFlag, int indNo, string outStr)
 }
 
 
-bool checkHairPin(string subSeq, int stemLen, int loopLen)
-{
-    int totalLen = subSeq.length();
-    int countMatch = 0;
-    char leftNuct = ' ', rightNuct = ' ';
-    int endLen = totalLen - stemLen + 1;
-    char compNuct[4] = { 'T', 'A', 'G', 'C' };
-    int leftEnd = totalLen / 2 - loopLen / 2 - 1;
-    int rightEnd = totalLen / 2 + loopLen / 2;
-    for (leftEnd; leftEnd >= 0;)
-    {
-        leftNuct = compNuct[convertNTtoInt(subSeq[rightEnd])];
-        if (subSeq[leftEnd] == leftNuct)
-        {
-            rightEnd = rightEnd + 1;
-            leftEnd = leftEnd - 1;
-            countMatch = countMatch + 1;
-        }
-        else if (subSeq[leftEnd] == subSeq[rightEnd])
-        {
-            rightEnd = rightEnd + 1;
-            leftEnd = leftEnd - 1;
-        }
-        else
-        {
-            return false;
-        }
-    }
-    if (countMatch >= stemLen)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-int searchForHairPins(string inputStr, int lenSubSeq, int stemLen, int loopLen)
-{
-    int i = 0, j = 0, countHairPins = 0;
-    int endLen = inputStr.length() - lenSubSeq + 1;
-    string subSeq;
-    for (i = 0; i < endLen; i++)
-    {
-        subSeq = inputStr.substr(i, lenSubSeq);
-        if (checkHairPin(subSeq, stemLen, loopLen) == true)
-        {
-            countHairPins = countHairPins + 1;
-            i += lenSubSeq;
-            //cout << "\n" << subSeq;
-        }
-    }
-    return countHairPins;
-}
-
-int findHaipinSequence(string inputDNAStr, int strandSize, 
-    int subSeqLen, int loopLen, int stemLen)
-{
-    int countHairPins = 0, countTotalHairPins = 0, hasStrand = 0;
-
-    //Check for the Hairpins using our proposed method
-    for (int i = 0; i < inputDNAStr.length(); i = i + strandSize)
-    {
-        hasStrand = 0;
-        string subSeq = inputDNAStr.substr(i, strandSize);
-        hasStrand = searchForHairPins(subSeq, subSeqLen, loopLen, stemLen);
-        if (hasStrand > 0)
-        {
-            countHairPins += 1;
-            countTotalHairPins += hasStrand;
-        }
-    }
-    cout << "\nHarpin Sequences Count: " << countTotalHairPins;
-    return countTotalHairPins;
-}
-
-int removeHairpinSequence(string inputDNAStr, int strandSize,
-    int subSeqLen, int loopLen, int stemLen)
-{
-    int countHairPins = 0, countTotalHairPins = 0, hasStrand = 0;
-
-    //Check for the Hairpins using our proposed method
-    for (int i = 0; i < inputDNAStr.length(); i = i + strandSize)
-    {
-        hasStrand = 0;
-        string subSeq = inputDNAStr.substr(i, strandSize);
-        //hasStrand = searchAndRemoveHairPins(subSeq, subSeqLen, loopLen, stemLen);
-        if (hasStrand > 0)
-        {
-            countHairPins += 1;
-            countTotalHairPins += hasStrand;
-            cout << "\nRemoved! " << countTotalHairPins;
-        }
-    }
-    return countTotalHairPins;
-}
-
-
 float calculateHammingDistance(string inputStr, int subStrLen, int minHamDist)
 {
     float avgDist = 0.0, countDist = 0, sumDist = 0;
@@ -1427,7 +1380,7 @@ int main()
         string inputStr = "", tempStr = "01";
 
         // input binary string length
-        int strSize = 0, strandSize = 315, serialNo = 0, gcVarMatLen = 16, noOfInstances = 1;
+        int strSize = 0, strandSize = 945, serialNo = 0, gcVarMatLen = 16, noOfInstances = 1;
 
         // Enter the length of the homopoly
         int contGCParts = 1, subSeqLen = 7, homopoly = 1, range = 80, base = 10;
@@ -1458,7 +1411,7 @@ int main()
             {
                 if (homopoly == 1)
                 {
-                    //inputDNAStr = inputDNAStr.substr(0, 93);
+                    //inputDNAStr = inputDNAStr.substr(0, 945);
 
                     cout << "\nInput    :" << inputDNAStr.length();
                     //Encode the DNA sequence using our proposed method
@@ -1468,6 +1421,17 @@ int main()
                     string encodeOutStr = encodeDNAStrWithExtendedVersion(encodeStr, subSeqLenForHairpin);
                     cout << "\nExtended :" << encodeOutStr.length();
 
+                    string encodeExtendedOutStr = checkAndRemoveHairpins(encodeOutStr, 12, 0, 26, 6, 7);
+
+                    encodeExtendedOutStr = checkAndRemoveHairpins(encodeOutStr, 12, 4, 26, 6, 7);
+
+                    encodeExtendedOutStr = checkAndRemoveHairpins(encodeOutStr, 12, 8, 26, 6, 7);
+
+                    encodeExtendedOutStr = checkAndRemoveHairpins(encodeOutStr, 12, 12, 26, 6, 7);
+
+                    encodeExtendedOutStr = checkAndRemoveHairpins(encodeOutStr, 12, 16, 26, 6, 7);
+
+                    encodeExtendedOutStr = checkAndRemoveHairpins(encodeOutStr, 12, 64, 26, 6, 7);
                     //Conversely, Decoding is performed below                     
                     string decodeOutStr = decodeDNAStrWithExtendedVersion(encodeOutStr, subSeqLenForHairpin);
                     cout << "\nDe-Extend:" << decodeOutStr.length();
@@ -1482,12 +1446,10 @@ int main()
                     else
                     {
                         cout << "\nOh!..Un-Successfull!";
+                        return 0;
                     }
-                    //cout << "\nLength of the string:" << inputDNAStr.length();
-                    //cout << "\nLength of the string:" << encodeOutStr.length();
-                    // 
-                    return 0;
-                    hairpinCount = findHaipinSequence(encodeOutStr, strandSize, 20, 6, 6);
+                    
+                    
                     /*
                     if (hairpinCount > 0)
                     {

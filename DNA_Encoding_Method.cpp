@@ -699,7 +699,6 @@ string halfConverseStr(string inputStr)
             outStr += inputStr[i];
         }
     }
-
     return outStr;
 }
 
@@ -761,6 +760,7 @@ int doHairPinExistsInSubSequence(string inputStr, int subSeqLen, int loopLen, in
         if (isAHairPin(subSeqTemp, loopLen, stemLen))
         {
             countHairPins++;
+            i += subSeqLen;
         }
     }
     return countHairPins;
@@ -772,7 +772,6 @@ int doHairpinExistsInBlockSequence(string inputDNAStr, int blockSize,
 {
     string subSeqTemp = "";
     int countHairPins = 0, countTotalHairPins = 0;
-    bool hasHairPin = 0;
 
     //Check for the Hairpins using our proposed method
     for (int i = 0; i < inputDNAStr.length(); i = i + blockSize)
@@ -782,30 +781,176 @@ int doHairpinExistsInBlockSequence(string inputDNAStr, int blockSize,
             subSeqLen, loopLen, stemLen);
         countTotalHairPins += countHairPins;
     }
-    cout << "\nTotal blocks:   " << inputDNAStr.length() / blockSize;
-    cout << "\nTotal hairpins: " << countTotalHairPins;
     return countTotalHairPins;
+}
+
+
+
+/*
+string removeHairpinInSubSequence(string inputDNAStr,
+    int blockSize, int subSeqLen, int loopLen, int stemLen)
+{
+    int countHairPins = 0, j = 0, i = 0, k = 0,
+        endLen = inputDNAStr.length() - subSeqLen + 1;
+    string subSeqTemp = "", outDNAStr = "";
+
+    //Check for the Hairpins using our proposed method
+    for (i = 0; i < endLen; i = i + 1)
+    {
+        j += 1;
+        subSeqTemp = inputDNAStr.substr(i, subSeqLen);
+        if (isAHairPin(subSeqTemp, loopLen, stemLen))
+        {
+            k = (i / blockSize) * blockSize;
+            cout << ",  Block#:" << (i / blockSize) << ", :" << subSeqTemp;
+            if (i % blockSize < (blockSize/2))
+            {
+                outDNAStr += halfConverseStr(inputDNAStr.substr(k, blockSize));
+                outDNAStr += halfConverseStr(inputDNAStr.substr(k + blockSize, blockSize));
+                outDNAStr += inputDNAStr.substr(k + 2 * blockSize, blockSize);
+            }
+            else
+            {
+                outDNAStr += inputDNAStr.substr(k, blockSize);
+                outDNAStr += halfConverseStr(inputDNAStr.substr(k + blockSize, blockSize));
+                outDNAStr += halfConverseStr(inputDNAStr.substr(k + 2 * blockSize, blockSize));
+            }
+            i = k + 3 * blockSize;
+            j = 0;
+        }
+        else
+        {
+            if (j % blockSize == 0)
+            {
+                k = (i / blockSize) * blockSize;
+                outDNAStr += inputDNAStr.substr(k, blockSize);
+                j = 0;
+            }
+        }
+    }
+    outDNAStr = outDNAStr + inputDNAStr.substr(i, blockSize);
+
+    return outDNAStr;
+}
+*/
+string removeHairpinInSubSequence(string inputDNAStr, 
+    int blockSize, int subSeqLen, int loopLen, int stemLen)
+{
+    int countHairPins = 0, j = 0, i = 0, k = 0, b = 0,
+        endLen = inputDNAStr.length() - (3 * blockSize);
+    string subSeqTemp = "", outDNAStr = "";
+
+    int nBlocks = inputDNAStr.length() / blockSize;
+    int * bitBlock = new int[nBlocks];
+
+    for (j = 0; j < nBlocks; j++)
+    {
+        bitBlock[j] = 0;
+    }
+    //Check for the Hairpins using our proposed method
+    for (i = 0; i < endLen; i = i + 1)
+    {
+        subSeqTemp = inputDNAStr.substr(i, subSeqLen);
+        if (isAHairPin(subSeqTemp, loopLen, stemLen))
+        {
+            b = (i / blockSize);
+            if ((i % blockSize) < (blockSize/2))
+            {
+                bitBlock[b] = 1;
+                //b += 1;
+                //bitBlock[b] = 1;
+            }
+            else
+            {
+                b += 1;
+                bitBlock[b] = 1;
+                b += 1;
+                bitBlock[b] = 1;
+            }
+            i = i - (i % blockSize);
+            i += 2 * blockSize;
+            k += 1;
+        }
+    }
+    k = 0, i = 0;
+    for (j = 0; j < nBlocks; j += 1)
+    {
+        k = j * blockSize;
+        subSeqTemp = "";
+        
+        if (bitBlock[j] == 1)
+        {
+           subSeqTemp += halfConverseStr(inputDNAStr.substr(k, blockSize + 1));    
+        }
+        else
+        {
+            subSeqTemp = inputDNAStr.substr(k, blockSize);
+        }
+        outDNAStr += subSeqTemp;
+    }
+    delete[] bitBlock;
+    return outDNAStr;
+}
+
+string removeHairpinInDNASequence(string inputDNAStr, 
+    int bigBlockSize, int blockSize,
+    int subSeqLen, int loopLen, int stemLen)
+{
+    string subSeqTemp = "", outDNAStr = "";
+    int countHairPins = 0, countTotalHairPins = 0;
+    bool hasHairPin = 0;
+
+    //Check for the Hairpins using our proposed method
+    for (int i = 0; i < inputDNAStr.length(); i = i + bigBlockSize)
+    {
+        subSeqTemp = inputDNAStr.substr(i, bigBlockSize);
+        countHairPins = doHairPinExistsInSubSequence(subSeqTemp,
+            subSeqLen, loopLen, stemLen);
+        if (countHairPins > 0)
+        {
+            //cout << "\nBigBlock#:" << i/ bigBlockSize;
+            outDNAStr += removeHairpinInSubSequence(subSeqTemp,
+                blockSize, subSeqLen, loopLen, stemLen);
+            countTotalHairPins += countHairPins;
+        }
+        else
+        {
+            outDNAStr += subSeqTemp;
+        }
+    }
+    return outDNAStr;
 }
 
 string checkAndRemoveHairpins(string inputDNAStr, int blockSize,
     int nBlocks, int subSeqLen, int loopLen, int stemLen)
 {
-    cout << "\n===================================================";
+    //cout << "\n===================================================\n";
+    int bigBlockSize = 0;
     string outDNAStr = "";
     if (nBlocks == 0)
     {
-        cout << "\nSize of block:" << inputDNAStr.length() 
-            << ", Without Blocking : " << 
+        cout << "\nSize of block/length:" << inputDNAStr.length() 
+             << ", Count of Hairpins    : " << 
             doHairPinExistsInSubSequence(inputDNAStr,
             subSeqLen, loopLen, stemLen);
+        
+        outDNAStr = removeHairpinInSubSequence(inputDNAStr,
+            blockSize, subSeqLen, loopLen, stemLen);
     }
     else
     {
-        blockSize = blockSize * nBlocks;
-        cout << "\nSize of block (nucleotides):" << blockSize;
-        doHairpinExistsInBlockSequence(inputDNAStr, blockSize,
-            subSeqLen, loopLen, stemLen);
+        bigBlockSize = blockSize * nBlocks;
+        
+        int countTotalHairPins = doHairpinExistsInBlockSequence(inputDNAStr, 
+            bigBlockSize, subSeqLen, loopLen, stemLen);
+
+        cout << "\nSize of block (nucleotides):" << bigBlockSize;
+        cout << ", Total blocks:   " << inputDNAStr.length() / bigBlockSize;
+        cout << ", Total hairpins: " << countTotalHairPins;
+        outDNAStr = removeHairpinInDNASequence(inputDNAStr,
+            bigBlockSize, blockSize, subSeqLen, loopLen, stemLen);
     }
+    //cout << "\n===================================================\n";
     return outDNAStr;
 }
 
@@ -817,7 +962,7 @@ string encodeDNAStrWithExtendedVersion(string inputStr, int blockSize) {
         endLen = inputStr.length() - blockSize + 1;
     bool isHairpinExists = true;
 
-    for (i = 0; i < endLen; i += j)   
+    for (i = 0; i <= endLen; i += j)   
     {
         g = convertNTtoInt(inputStr[i + j - 1]);
         h = convertNTtoInt(inputStr[i + j]);
@@ -838,7 +983,7 @@ string decodeDNAStrWithExtendedVersion(string inputStr, int blockSize) {
     int i = 0, g = 0, h = 0, k = 0, j = blockSize,
         endLen = inputStr.length() - blockSize + 1;
 
-    for (i = 0; i < endLen; i += j)
+    for (i = 0; i <= endLen; i += j)
     {
         g = convertNTtoInt(inputStr[i + j - 2]);
         h = convertNTtoInt(inputStr[i + j]);
@@ -1380,7 +1525,7 @@ int main()
         string inputStr = "", tempStr = "01";
 
         // input binary string length
-        int strSize = 0, strandSize = 945, serialNo = 0, gcVarMatLen = 16, noOfInstances = 1;
+        int strSize = 0, strandSize = 1260, serialNo = 0, gcVarMatLen = 16, noOfInstances = 50;
 
         // Enter the length of the homopoly
         int contGCParts = 1, subSeqLen = 7, homopoly = 1, range = 80, base = 10;
@@ -1409,35 +1554,51 @@ int main()
            
             while (homopoly < 5)
             {
-                if (homopoly == 1)
+                if (homopoly < 2)
                 {
-                    //inputDNAStr = inputDNAStr.substr(0, 945);
+                    cout << "\n============================================:" << homopoly;
+                    inputDNAStr = inputDNAStr.substr(0, 13860);
+                    //inputDNAStr = inputDNAStr.substr(0, 231);
 
                     cout << "\nInput    :" << inputDNAStr.length();
+                    //cout << "\nInputStr  :" << inputDNAStr;
                     //Encode the DNA sequence using our proposed method
                     string encodeStr = encodeDNAStrWithOption(inputDNAStr, homopoly);
                     cout << "\nEncoded  :" << encodeStr.length();
+                    //cout << "\nEncodedStr:" << encodeStr;
 
                     string encodeOutStr = encodeDNAStrWithExtendedVersion(encodeStr, subSeqLenForHairpin);
                     cout << "\nExtended :" << encodeOutStr.length();
+                    //cout << "\nExtended :" << encodeOutStr;
 
                     string encodeExtendedOutStr = checkAndRemoveHairpins(encodeOutStr, 12, 0, 26, 6, 7);
+                    cout << "\nHairpinB :" << encodeExtendedOutStr.length();
+                    //cout << "\nHairpinB :" << encodeExtendedOutStr;
 
-                    encodeExtendedOutStr = checkAndRemoveHairpins(encodeOutStr, 12, 4, 26, 6, 7);
-
+                    encodeExtendedOutStr = checkAndRemoveHairpins(encodeExtendedOutStr, 12, 0, 26, 6, 7);
+                    cout << "\nHairpinA :" << encodeExtendedOutStr.length();
+                    //cout << "\nHairpinA :" << encodeExtendedOutStr;
+          
                     encodeExtendedOutStr = checkAndRemoveHairpins(encodeOutStr, 12, 8, 26, 6, 7);
-
-                    encodeExtendedOutStr = checkAndRemoveHairpins(encodeOutStr, 12, 12, 26, 6, 7);
+                    encodeExtendedOutStr = checkAndRemoveHairpins(encodeExtendedOutStr, 12, 8, 26, 6, 7);
 
                     encodeExtendedOutStr = checkAndRemoveHairpins(encodeOutStr, 12, 16, 26, 6, 7);
+                    encodeExtendedOutStr = checkAndRemoveHairpins(encodeExtendedOutStr, 12, 16, 26, 6, 7);
+      
+                    encodeExtendedOutStr = checkAndRemoveHairpins(encodeOutStr, 12, 32, 26, 6, 7);
+                    encodeExtendedOutStr = checkAndRemoveHairpins(encodeExtendedOutStr, 12, 32, 26, 6, 7);
 
                     encodeExtendedOutStr = checkAndRemoveHairpins(encodeOutStr, 12, 64, 26, 6, 7);
+                    encodeExtendedOutStr = checkAndRemoveHairpins(encodeExtendedOutStr, 12, 64, 26, 6, 7);
+
                     //Conversely, Decoding is performed below                     
                     string decodeOutStr = decodeDNAStrWithExtendedVersion(encodeOutStr, subSeqLenForHairpin);
                     cout << "\nDe-Extend:" << decodeOutStr.length();
+                    //cout << "\nDe-Extend:" << decodeOutStr;
 
                     string decodeStr = decodeDNAStrWithOption(decodeOutStr, homopoly);
                     cout << "\nDecoded  :" << decodeStr.length();
+                    //cout << "\nDecoded  :" << decodeStr;
 
                     if (inputDNAStr.compare(decodeStr) == 0)
                     {
@@ -1445,10 +1606,27 @@ int main()
                     }
                     else
                     {
-                        cout << "\nOh!..Un-Successfull!";
-                        return 0;
+                        cout << "\nOh!..Un-Successfull decoding!";
+                        //return 0;
                     }
-                    
+
+                    decodeOutStr = decodeDNAStrWithExtendedVersion(encodeExtendedOutStr, subSeqLenForHairpin);
+                    cout << "\nDe-Extend:" << decodeOutStr.length();
+                    //cout << "\nDe-Extend:" << decodeOutStr;
+
+                    decodeStr = decodeDNAStrWithOption(decodeOutStr, homopoly);
+                    cout << "\nDecoded  :" << decodeStr.length();
+                    //cout << "\nDecoded  :" << decodeStr;
+
+                    if (inputDNAStr.compare(decodeStr) == 0)
+                    {
+                        cout << "\nSuccessfully decoded!";
+                    }
+                    else
+                    {
+                        cout << "\nOh!..Un-Successfull decoding!";
+                        //return 0;
+                    }
                     
                     /*
                     if (hairpinCount > 0)

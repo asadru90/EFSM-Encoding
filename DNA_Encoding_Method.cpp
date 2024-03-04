@@ -11,11 +11,13 @@
 #include <cstdlib>
 #include <iomanip>
 #include <cmath>
+#include <bitset>
 
 using namespace std;
 int printFlag = 1;
+static float sum = 0;
 
-char convertDNATable[4][4] = { 
+char convertDNATable[4][4] = {
     {'A', 'T', 'C', 'G'},
     {'T', 'C', 'G', 'A'},
     {'C', 'G', 'A', 'T'},
@@ -74,8 +76,8 @@ char rightTable1[4][4] = {
     {'T', 'G', 'T', 'A'},
     {'C', 'A', 'A', 'C'}
 };
-  
-char leftTable1[4][4] = { 
+
+char leftTable1[4][4] = {
     {'C', 'G', 'G', 'T'},
     {'G', 'C', 'A', 'C'},
     {'G', 'A', 'G', 'T'},
@@ -175,11 +177,32 @@ string convertBinarytoDNAStr(string bitStr, int homopoly, int percent)
                 outDNAStr[j] = 'A';
         }
     }
-    
-    while (bitLen % (homopoly*2+1) != 0)
+
+    while (bitLen % (homopoly * 2 + 1) != 0)
     {
         outDNAStr += 'G';
         bitLen = outDNAStr.length();
+    }
+    return outDNAStr;
+}
+
+
+string convertBinaryToDNAStr(string bitInputStr)
+{
+    string outDNAStr = "", temp = "";
+    
+    for (int j = 0; j < bitInputStr.length(); j += 2)
+    {
+        temp = bitInputStr[j];
+        temp = temp + bitInputStr[j + 1];
+        if (temp == "00")
+            outDNAStr += 'A';
+        else if (temp == "01")
+            outDNAStr += 'G';
+        else if (temp == "10")
+            outDNAStr += 'T';
+        else if (temp == "11")
+            outDNAStr += 'C';
     }
     return outDNAStr;
 }
@@ -218,7 +241,7 @@ int** calcGCVariance(string encodeOutStr, int subSeqLen)
 {
     int prevSubSeq = 0, nextSubSeq = 0, countSubSeq = 0;
     int noOfCombination = pow(4, subSeqLen);
-    int** matrixSubSeq = new int*[noOfCombination];
+    int** matrixSubSeq = new int* [noOfCombination];
     for (int k = 0; k < noOfCombination; k++)
     {
         matrixSubSeq[k] = new int[noOfCombination];
@@ -711,11 +734,11 @@ bool isAHairPin(string subSeq, int loopLen, int stemLen)
     int cntMatch = 0, subSeqLen = subSeq.length();
     int leftEnd = (subSeqLen - loopLen) / 2 - 1;
     int rightEnd = (subSeqLen + loopLen) / 2;
-    
+
     for (rightEnd; rightEnd < subSeqLen;)
     {
         lNuc = compNuc[convertNTtoInt(subSeq[rightEnd])];
-        
+
         if (subSeq[leftEnd] == lNuc)
         {
             rightEnd = rightEnd + 1;
@@ -731,7 +754,7 @@ bool isAHairPin(string subSeq, int loopLen, int stemLen)
         {
             return true;
         }
-        else 
+        else
         {
             return false;
         }
@@ -753,7 +776,7 @@ int doHairPinExistsInSubSequence(string inputStr, int subSeqLen, int loopLen, in
     string subSeqTemp = "";
     int i = 0, j = 0, countHairPins = 0;
     int endLen = inputStr.length() - subSeqLen + 1;
-    
+
     for (i = 0; i < endLen; i++)
     {
         subSeqTemp = inputStr.substr(i, subSeqLen);
@@ -767,7 +790,7 @@ int doHairPinExistsInSubSequence(string inputStr, int subSeqLen, int loopLen, in
 }
 
 
-int doHairpinExistsInBlockSequence(string inputDNAStr, int blockSize, 
+int doHairpinExistsInBlockSequence(string inputDNAStr, int blockSize,
     int subSeqLen, int loopLen, int stemLen)
 {
     string subSeqTemp = "";
@@ -833,7 +856,7 @@ string removeHairpinInSubSequence(string inputDNAStr,
     return outDNAStr;
 }
 */
-string removeHairpinInSubSequence(string inputDNAStr, 
+string removeHairpinInSubSequence(string inputDNAStr,
     int blockSize, int subSeqLen, int loopLen, int stemLen)
 {
     int countHairPins = 0, j = 0, i = 0, k = 0, b = 0,
@@ -841,7 +864,7 @@ string removeHairpinInSubSequence(string inputDNAStr,
     string subSeqTemp = "", outDNAStr = "";
 
     int nBlocks = inputDNAStr.length() / blockSize;
-    int * bitBlock = new int[nBlocks];
+    int* bitBlock = new int[nBlocks];
 
     for (j = 0; j < nBlocks; j++)
     {
@@ -854,7 +877,7 @@ string removeHairpinInSubSequence(string inputDNAStr,
         if (isAHairPin(subSeqTemp, loopLen, stemLen))
         {
             b = (i / blockSize);
-            if ((i % blockSize) < (blockSize/2))
+            if ((i % blockSize) < (blockSize / 2))
             {
                 bitBlock[b] = 1;
                 //b += 1;
@@ -877,10 +900,10 @@ string removeHairpinInSubSequence(string inputDNAStr,
     {
         k = j * blockSize;
         subSeqTemp = "";
-        
+
         if (bitBlock[j] == 1)
         {
-           subSeqTemp += halfConverseStr(inputDNAStr.substr(k, blockSize + 1));    
+            subSeqTemp += halfConverseStr(inputDNAStr.substr(k, blockSize + 1));
         }
         else
         {
@@ -892,7 +915,7 @@ string removeHairpinInSubSequence(string inputDNAStr,
     return outDNAStr;
 }
 
-string removeHairpinInDNASequence(string inputDNAStr, 
+string removeHairpinInDNASequence(string inputDNAStr,
     int bigBlockSize, int blockSize,
     int subSeqLen, int loopLen, int stemLen)
 {
@@ -922,26 +945,25 @@ string removeHairpinInDNASequence(string inputDNAStr,
 }
 
 string checkAndRemoveHairpins(string inputDNAStr, int blockSize,
-    int nBlocks, int subSeqLen, int loopLen, int stemLen)
+    int nBlocks, int subSeqLen, int loopLen, int stemLen, bool flag)
 {
     //cout << "\n===================================================\n";
     int bigBlockSize = 0;
     string outDNAStr = "";
     if (nBlocks == 0)
     {
-        cout << "\nSize of block/length:" << inputDNAStr.length() 
-             << ", Count of Hairpins    : " << 
+        cout << "\nSize of block/length:" << inputDNAStr.length()
+            << ", Count of Hairpins    : " <<
             doHairPinExistsInSubSequence(inputDNAStr,
-            subSeqLen, loopLen, stemLen);
-        
+                subSeqLen, loopLen, stemLen);
+
         outDNAStr = removeHairpinInSubSequence(inputDNAStr,
             blockSize, subSeqLen, loopLen, stemLen);
     }
     else
     {
         bigBlockSize = blockSize * nBlocks;
-        
-        int countTotalHairPins = doHairpinExistsInBlockSequence(inputDNAStr, 
+        int countTotalHairPins = doHairpinExistsInBlockSequence(inputDNAStr,
             bigBlockSize, subSeqLen, loopLen, stemLen);
 
         cout << "\nSize of block (nucleotides):" << bigBlockSize;
@@ -954,15 +976,14 @@ string checkAndRemoveHairpins(string inputDNAStr, int blockSize,
     return outDNAStr;
 }
 
-
 string encodeDNAStrWithExtendedVersion(string inputStr, int blockSize) {
-   
+
     string outStr = "", subStrBlock = "";
     int i = 0, g = 0, h = 0, k = 0, j = blockSize - 1,
         endLen = inputStr.length() - blockSize + 1;
     bool isHairpinExists = true;
 
-    for (i = 0; i <= endLen; i += j)   
+    for (i = 0; i <= endLen; i += j)
     {
         g = convertNTtoInt(inputStr[i + j - 1]);
         h = convertNTtoInt(inputStr[i + j]);
@@ -970,7 +991,7 @@ string encodeDNAStrWithExtendedVersion(string inputStr, int blockSize) {
         outStr += inputStr.substr(i, j);
         outStr += leftTable[g][h];
     }
-    
+
     k = endLen - i - j;
     outStr = outStr + inputStr.substr(i, k);
 
@@ -978,7 +999,7 @@ string encodeDNAStrWithExtendedVersion(string inputStr, int blockSize) {
 }
 
 string decodeDNAStrWithExtendedVersion(string inputStr, int blockSize) {
-    
+
     string outStr = "";
     int i = 0, g = 0, h = 0, k = 0, j = blockSize,
         endLen = inputStr.length() - blockSize + 1;
@@ -997,7 +1018,7 @@ string decodeDNAStrWithExtendedVersion(string inputStr, int blockSize) {
             outStr += inputStr.substr(i, j);
         }
     }
-    
+
     k = endLen - i - j;
     inputStr = outStr + inputStr.substr(i, k);
     outStr = "";
@@ -1009,7 +1030,7 @@ string decodeDNAStrWithExtendedVersion(string inputStr, int blockSize) {
         i += 1;
     }
     outStr = outStr + inputStr.substr(i, k);
-    
+
     return outStr;
 }
 
@@ -1236,7 +1257,7 @@ void printMatrixGCVariance(int** matrixSubSeq, int subSeqLen, int matValLen)
     valCol = 0;
 
     cout << "\n================= GC Variation =====================\n";
-    
+
     for (int j = 0; j < martixLen && valCol <= matValLen * 2; j += 3)
     {
         if (matrixSubSeqRow[j] == 1)
@@ -1253,12 +1274,12 @@ void printMatrixGCVariance(int** matrixSubSeq, int subSeqLen, int matValLen)
             }
         }
     }
-    
+
     cout << "\n================= GC Variation =====================\n";
 
     valCol = 0;
     valRow = 0;
-    
+
     cout << "\n[\n";
     int counter = 0;
     for (int j = 0; valRow <= matValLen * 2 && j < martixLen; j += 3)
@@ -1268,7 +1289,7 @@ void printMatrixGCVariance(int** matrixSubSeq, int subSeqLen, int matValLen)
             cout << "\n" << counter++ << "[";
             valCol = 0;
             valRow = valRow + 1;
-            
+
             int flagTemp = 0;
             for (int k = 0; valCol <= matValLen * 2 && k < martixLen; k += 3)
             {
@@ -1293,9 +1314,8 @@ void printMatrixGCVariance(int** matrixSubSeq, int subSeqLen, int matValLen)
     cout << "\n================= GC Variation =====================\n";
 }
 
-void writeToFile(int percentGC, int encoded, int homopoly)
+void writeToFile(int percentGC, int encoded, int homopoly, string filePath)
 {
-    string filePath = "D:\\PhDGoetheUni\\Works\\PhD_Work\\3.Encoding_Method_Paper\\Results\\DNAEncodingResults\\";
     string fileName = filePath + "filename_GContent_";
     if (homopoly == 0)
         fileName += "O.csv";
@@ -1313,25 +1333,15 @@ void writeToFile(int percentGC, int encoded, int homopoly)
     // Create and open a text file
     if (myFile.is_open())
     {
-        myFile << endl << percentGC ;
+        myFile << endl << percentGC;
         myFile.close();
     }
     else cerr << "Unable to open file";
 }
 
-void printMatrixGCContent(int* matrixGCcontent, int parts, int totalLen, int homopoly, bool encoded)
+void printMatrixGCContent(int* matrixGCcontent, int parts, int totalLen, int homopoly, string filePath, bool encoded)
 {
-    int max = 0, min = 100;
-    if (encoded == true)
-    {
-        //cout << "\nEncoded String : Homopoly" << homopoly << "\n";
-    }
-    else
-    {
-        //cout << "\nOriginal String: Homopoly" << homopoly << "\n";
-        return;
-    }
-    
+    int max = 0, min = 100, sum = 0, avg = 0, diff = 0;
     for (int j = 0; j < parts; j++)
     {
         int percentGC = (matrixGCcontent[j] * 100) / (totalLen / parts);
@@ -1343,19 +1353,21 @@ void printMatrixGCContent(int* matrixGCcontent, int parts, int totalLen, int hom
         {
             max = percentGC;
         }
-        //cout << j+1 << ":" << percentGC << "%, ";
-            if (homopoly <= 1)
-                homopoly = 0;
-            else
-                homopoly = 5;
-
-        //if (encoded and (percentGC > 60 or percentGC < 40))
-        //{
-        //    cout << "  Out of range!";
-        //}
-        writeToFile(percentGC, encoded, homopoly);
+        sum += percentGC;
+        if (percentGC >= 50)
+        {
+            diff += (percentGC - 50);
+        }
+        else
+        {
+            diff += (50 - percentGC);
+        }
+        //writeToFile(percentGC, encoded, homopoly, filePath);
     }
-    cout << max - min << ", ";
+    cout << "\nMax and min GC content of any  :" << max << ", " << min;
+    cout << "\nTotal strands of the object    :" << parts;
+    cout << "\nAverage GC content per strand  :" << sum/parts;
+    cout << "\nAverage GC variation per strand:" << diff / parts;
 }
 
 void mainPrint(bool printFlag, int indNo, string outStr)
@@ -1416,7 +1428,8 @@ void printResutls(bool printAll,
     int contentGCParts,
     int serialNo,
     int strandSize,
-    int gcVarMatLen)
+    int gcVarMatLen,
+    string filePath)
 {
     // printing could be performed using the below lines of code, 
     // disable indivitual printing using fasle instead.
@@ -1432,26 +1445,29 @@ void printResutls(bool printAll,
     mainPrint(printAll && false, 2, encodeOutStr);
     mainPrint(printAll && false, 0, decodeOutStr);
     mainPrint(printAll && false, 3, decodeOutStr);
-    mainPrint(printAll && false, 4, (checkEncodeDecode(inputDNAStr, decodeOutStr) == 0 ? "YES" : "OH! NO"));
-    mainPrint(printAll && false, 5, (checkHomopolymers(encodeOutStr) <= homopoly ? "YES" : "OH! NO"));
+    mainPrint(printAll && true, 4, (checkEncodeDecode(inputDNAStr, decodeOutStr) == 0 ? "YES" : "OH! NO"));
+    mainPrint(printAll && true, 5, (checkHomopolymers(encodeOutStr) <= homopoly ? "YES" : "OH! NO"));
     mainPrint(printAll && false, 6, "Done!");
-    
-    //cout << "\nInformation Density: " << infoDensity << "  and homopoly:" << homopoly;
+
+    cout << "\nInformation Density: " << infoDensity << "  and homopoly:" << homopoly;
     // Calculate the GC content parts of the input string
     //if (homopoly == 1)
     //{
     //    int** martixGCVariance = calcGCVariance(encodeOutStr, subSeqLen);
     //    //printMatrixGCVariance(martixGCVariance, subSeqLen, gcVarMatLen);
     //}
+
     
-    contentGCParts = inputDNAStr.length() / strandSize;
+    homopoly = 0;
+    contentGCParts = encodeOutStr.length() / strandSize;
     int* matrixGCcontent = calcPercentGC(inputDNAStr, contentGCParts);
-    printMatrixGCContent(matrixGCcontent, contentGCParts, inputDNAStr.length(), homopoly, false);
+    printMatrixGCContent(matrixGCcontent, contentGCParts, inputDNAStr.length(), homopoly, filePath, true);
 
     // Calculate the GC content parts of the DNA endcoded string
+    homopoly = 1;
     contentGCParts = encodeOutStr.length() / strandSize;
     matrixGCcontent = calcPercentGC(encodeOutStr, contentGCParts);
-    printMatrixGCContent(matrixGCcontent, contentGCParts, encodeOutStr.length(), homopoly, true);
+    printMatrixGCContent(matrixGCcontent, contentGCParts, encodeOutStr.length(), homopoly, filePath, true);
 
     //calculateHammingDistance(encodeOutStr, subSeqLen, subSeqLen - 2);
 
@@ -1508,6 +1524,179 @@ void clearAllFiles(string filePath, int strLen)
 
 }
 
+string convertLineToBitString(string inputStr)
+{
+    int num1 = 0, num2 = 0, pos = 0, len1 = 0, len2 = 0;
+    string outStr = "", tempStr = "";
+
+    pos = inputStr.find("\t");
+    tempStr = inputStr.substr(0, pos);
+    num1 = stoi(tempStr);
+    len1 = tempStr.length();
+    len2 = inputStr.length();
+    len2 = len2 - (len1 + 1);
+    tempStr = inputStr.substr(pos + 1, len2);
+    num2 = stoi(tempStr);
+
+    outStr = bitset< 12 >(num1).to_string();
+    outStr += bitset< 12 >(num2).to_string();
+    return outStr;
+}
+
+string convertTextFileToBinaryStr(string fileName)
+{
+    string outStr = "", tempStr = "";
+    fstream myFile(fileName);
+    
+    if (myFile.is_open())
+    {
+        while (getline(myFile, tempStr))
+        {
+            outStr += convertLineToBitString(tempStr);
+        }
+    }
+    else
+    {
+        cout << "\nFile opening error!" << fileName;
+    }
+    myFile.close();
+    cout << "\nLength of DataString:" << outStr.length();
+    return outStr;
+}
+
+int main()
+{
+    int p = 0;
+    setprecision(2);
+    string filePath = "D:\\PhDGoetheUni\\Works\\PhD_Work\\3.Encoding_Method_Paper\\Results\\datasets\\";
+    string fileName = filePath + "Blackhole_Pairwise_dataset1.txt";
+    //clearAllFiles(filePath, 32000);
+    cout << "\n";
+
+    if (true)
+    {
+        // Chose the printing flag status
+        bool printAll = true;
+        string inputDNAStr = "";
+
+        // Init few input parameters
+        int strSize = 0, serialNo = 0, hairpinCount = 0, homopoly = 0;
+
+        // Init the values of the required parameters
+        int contGCParts = 1, subSeqLen = 7, noOfInstances = 50,
+            gcVarMatLen = 16, blockLen = 12, strandSize = 768;
+
+        if (true)
+        {
+            homopoly = 1;
+            string inputBinaryStr = convertTextFileToBinaryStr(fileName);
+            cout << "\nLength of Bit String:" << inputBinaryStr.length();
+            inputDNAStr = convertBinaryToDNAStr(inputBinaryStr);
+            cout << "\nLength of DNA String:" << inputDNAStr.length();
+
+            //cout << "\n============================================:" << serialNo;
+            while (homopoly < 5)
+            {
+                if (homopoly == 2)
+                {
+                    //cout << "\n============================================:" << homopoly;
+                    //inputDNAStr = inputDNAStr.substr(0, 13860);
+
+                    cout << "\nInput    :" << inputDNAStr.length();
+                    //cout << "\nInputStr  :" << inputDNAStr;
+                    //Encode the DNA sequence using our proposed method
+                    string encodeStr = encodeDNAStrWithOption(inputDNAStr, homopoly);
+                    cout << "\nEncoded  :" << encodeStr.length();
+                    //cout << "\nEncodedStr:" << encodeStr;
+
+                    string encodeOutStr = encodeDNAStrWithExtendedVersion(encodeStr, blockLen);
+                    //cout << "\nExtended :" << encodeOutStr.length();
+                    //cout << "\nExtended :" << encodeOutStr;
+
+                    //string encodeExtendedOutStr = checkAndRemoveHairpins(encodeOutStr, 12, 0, 26, 6, 7, true);
+                    //cout << "\nHairpinB :" << encodeExtendedOutStr.length();
+                    //cout << "\nHairpinB :" << encodeExtendedOutStr;
+
+                    //encodeExtendedOutStr = checkAndRemoveHairpins(encodeExtendedOutStr, 12, 0, 26, 6, 7, true);
+                    //cout << "\nHairpinA :" << encodeExtendedOutStr.length();
+                    //cout << "\nHairpinA :" << encodeExtendedOutStr;
+
+                    string encodeExtendedOutStr = checkAndRemoveHairpins(encodeOutStr, 12, 8, 26, 6, 7, false);
+                    encodeExtendedOutStr = checkAndRemoveHairpins(encodeExtendedOutStr, 12, 8, 26, 6, 7, true);
+
+                    encodeExtendedOutStr = checkAndRemoveHairpins(encodeOutStr, 12, 16, 26, 6, 7, false);
+                    encodeExtendedOutStr = checkAndRemoveHairpins(encodeExtendedOutStr, 12, 16, 26, 6, 7, true);
+
+                    encodeExtendedOutStr = checkAndRemoveHairpins(encodeOutStr, 12, 32, 26, 6, 7, false);
+                    encodeExtendedOutStr = checkAndRemoveHairpins(encodeExtendedOutStr, 12, 32, 26, 6, 7, true);
+
+                    encodeExtendedOutStr = checkAndRemoveHairpins(encodeOutStr, 12, 64, 26, 6, 7, false);
+                    encodeExtendedOutStr = checkAndRemoveHairpins(encodeExtendedOutStr, 12, 64, 26, 6, 7, true);
+
+                    //Conversely, Decoding is performed below                     
+                    string decodeOutStr = decodeDNAStrWithExtendedVersion(encodeOutStr, blockLen);
+                    cout << "\nDe-Extend:" << decodeOutStr.length();
+                    //cout << "\nDe-Extend:" << decodeOutStr;
+
+                    string decodeStr = decodeDNAStrWithOption(decodeOutStr, homopoly);
+                    cout << "\nDecoded  :" << decodeStr.length();
+                    //cout << "\nDecoded  :" << decodeStr;
+
+                    
+                    if (inputDNAStr.compare(decodeStr) == 0)
+                    {
+                        cout << "\nSuccessfully decoded!";
+                    }
+                    else
+                    {
+                        cout << "\nOh!..Un-Successfull decoding!";
+                        //return 0;
+                    }
+
+                    decodeOutStr = decodeDNAStrWithExtendedVersion(encodeExtendedOutStr, blockLen);
+                    cout << "\nDe-Extend:" << decodeOutStr.length();
+                    //cout << "\nDe-Extend:" << decodeOutStr;
+
+                    decodeStr = decodeDNAStrWithOption(decodeOutStr, homopoly);
+                    cout << "\nDecoded  :" << decodeStr.length();
+                    //cout << "\nDecoded  :" << decodeStr;
+
+                    if (inputDNAStr.compare(decodeStr) == 0)
+                    {
+                        cout << "\nSuccessfully decoded!";
+                    }
+                    else
+                    {
+                        cout << "\nOh!..Un-Successfull decoding!";
+                        //return 0;
+                    }
+
+
+                    printResutls(
+                        printAll,
+                        inputDNAStr,
+                        encodeOutStr,
+                        decodeStr,
+                        homopoly,
+                        subSeqLen,
+                        contGCParts,
+                        serialNo,
+                        strandSize,
+                        gcVarMatLen,
+                        filePath);
+                        
+
+                }
+                //calculateHammingDistance(inputDNAStr, subSeqLen, subSeqLen-2);
+                homopoly += 1;
+            }
+
+        }
+
+    }
+}
+
+/*
 int main()
 {
     int p = 0;
@@ -1517,6 +1706,7 @@ int main()
     clearAllFiles(filePath, 16385);
     fstream myFile(fileName);
     cout << "\n";
+
     if (myFile.is_open())
     {
         // Chose the printing flag status
@@ -1539,67 +1729,68 @@ int main()
         }
         while (getline(myFile, inputStr) and serialNo < noOfInstances)
         {
-            
+
             while (inputStr.length() % strandSize != 0)
-            {   
+            {
                 inputStr += tempStr[rand() % 2];
             }
-            
+
             homopoly = 1;
             string inputDNAStr = convertBinarytoDNAStr(inputStr, homopoly, randPercent[serialNo++]);
             //calculateHammingDistance(inputDNAStr, subSeqLen, subSeqLen-2);
 
-            cout << "\n============================================:" << serialNo;
+            //cout << "\n============================================:" << serialNo;
             //findHaipinSequence(inputDNAStr, strandSize, true);
-           
+
             while (homopoly < 5)
             {
-                if (homopoly < 2)
+                if (homopoly == 1)
                 {
-                    cout << "\n============================================:" << homopoly;
+                    //cout << "\n============================================:" << homopoly;
                     inputDNAStr = inputDNAStr.substr(0, 13860);
                     //inputDNAStr = inputDNAStr.substr(0, 231);
 
-                    cout << "\nInput    :" << inputDNAStr.length();
+                    //cout << "\nInput    :" << inputDNAStr.length();
                     //cout << "\nInputStr  :" << inputDNAStr;
                     //Encode the DNA sequence using our proposed method
                     string encodeStr = encodeDNAStrWithOption(inputDNAStr, homopoly);
-                    cout << "\nEncoded  :" << encodeStr.length();
+                    //cout << "\nEncoded  :" << encodeStr.length();
                     //cout << "\nEncodedStr:" << encodeStr;
 
                     string encodeOutStr = encodeDNAStrWithExtendedVersion(encodeStr, subSeqLenForHairpin);
-                    cout << "\nExtended :" << encodeOutStr.length();
+                    //cout << "\nExtended :" << encodeOutStr.length();
                     //cout << "\nExtended :" << encodeOutStr;
 
-                    string encodeExtendedOutStr = checkAndRemoveHairpins(encodeOutStr, 12, 0, 26, 6, 7);
-                    cout << "\nHairpinB :" << encodeExtendedOutStr.length();
+                    //string encodeExtendedOutStr = checkAndRemoveHairpins(encodeOutStr, 12, 0, 26, 6, 7);
+                    //cout << "\nHairpinB :" << encodeExtendedOutStr.length();
                     //cout << "\nHairpinB :" << encodeExtendedOutStr;
 
-                    encodeExtendedOutStr = checkAndRemoveHairpins(encodeExtendedOutStr, 12, 0, 26, 6, 7);
-                    cout << "\nHairpinA :" << encodeExtendedOutStr.length();
+                    //encodeExtendedOutStr = checkAndRemoveHairpins(encodeExtendedOutStr, 12, 0, 26, 6, 7);
+                    //cout << "\nHairpinA :" << encodeExtendedOutStr.length();
                     //cout << "\nHairpinA :" << encodeExtendedOutStr;
-          
-                    encodeExtendedOutStr = checkAndRemoveHairpins(encodeOutStr, 12, 8, 26, 6, 7);
-                    encodeExtendedOutStr = checkAndRemoveHairpins(encodeExtendedOutStr, 12, 8, 26, 6, 7);
 
-                    encodeExtendedOutStr = checkAndRemoveHairpins(encodeOutStr, 12, 16, 26, 6, 7);
-                    encodeExtendedOutStr = checkAndRemoveHairpins(encodeExtendedOutStr, 12, 16, 26, 6, 7);
-      
-                    encodeExtendedOutStr = checkAndRemoveHairpins(encodeOutStr, 12, 32, 26, 6, 7);
-                    encodeExtendedOutStr = checkAndRemoveHairpins(encodeExtendedOutStr, 12, 32, 26, 6, 7);
+                    //string encodeExtendedOutStr = checkAndRemoveHairpins(encodeOutStr, 12, 8, 26, 6, 7, false);
+                    //encodeExtendedOutStr = checkAndRemoveHairpins(encodeExtendedOutStr, 12, 8, 26, 6, 7, true);
 
-                    encodeExtendedOutStr = checkAndRemoveHairpins(encodeOutStr, 12, 64, 26, 6, 7);
-                    encodeExtendedOutStr = checkAndRemoveHairpins(encodeExtendedOutStr, 12, 64, 26, 6, 7);
+                    //string encodeExtendedOutStr = checkAndRemoveHairpins(encodeOutStr, 12, 16, 26, 6, 7, false);
+                    //encodeExtendedOutStr = checkAndRemoveHairpins(encodeExtendedOutStr, 12, 16, 26, 6, 7, true);
+
+                    //string encodeExtendedOutStr = checkAndRemoveHairpins(encodeOutStr, 12, 32, 26, 6, 7, false);
+                    //encodeExtendedOutStr = checkAndRemoveHairpins(encodeExtendedOutStr, 12, 32, 26, 6, 7, true);
+
+                    string  encodeExtendedOutStr = checkAndRemoveHairpins(encodeOutStr, 12, 64, 26, 6, 7, false);
+                    encodeExtendedOutStr = checkAndRemoveHairpins(encodeExtendedOutStr, 12, 64, 26, 6, 7, true);
 
                     //Conversely, Decoding is performed below                     
                     string decodeOutStr = decodeDNAStrWithExtendedVersion(encodeOutStr, subSeqLenForHairpin);
-                    cout << "\nDe-Extend:" << decodeOutStr.length();
+                    //cout << "\nDe-Extend:" << decodeOutStr.length();
                     //cout << "\nDe-Extend:" << decodeOutStr;
 
                     string decodeStr = decodeDNAStrWithOption(decodeOutStr, homopoly);
-                    cout << "\nDecoded  :" << decodeStr.length();
+                    //cout << "\nDecoded  :" << decodeStr.length();
                     //cout << "\nDecoded  :" << decodeStr;
 
+                    /*
                     if (inputDNAStr.compare(decodeStr) == 0)
                     {
                         cout << "\nSuccessfully decoded!";
@@ -1627,14 +1818,12 @@ int main()
                         cout << "\nOh!..Un-Successfull decoding!";
                         //return 0;
                     }
-                    
-                    /*
+
                     if (hairpinCount > 0)
                     {
                         cout << "\nHairpin: " << hairpinCount;
                         removeHairpinSequence(encodeOutStr, strandSize, 20, 6, 6);
                     }
-                    */
 
                     /*printResutls(
                         printAll,
@@ -1647,12 +1836,10 @@ int main()
                         serialNo,
                         strandSize,
                         gcVarMatLen);
-                        */
-
                 }
                 homopoly += 1;
             }
-            
+
         }
         myFile.close();
 
@@ -1660,4 +1847,4 @@ int main()
     else
         cout << "File is not opening!";
     return 0;
-}
+}*/

@@ -1,53 +1,84 @@
 1. We have written this code in c++ language so we need a c++ compiler for it.
-2. We can run this "Code_DNA.cpp" file to check our encoding and decoding scheme.
-3. We can change the "strSize" variable in the "main" function for the selecting 
-the string's length of our choice.   
-4. Currently, please just select the length to a multiple of 3 and 4 both.
-e.g, 12, 24, 48, 60, 600 etc.  
+2. We can run this "DNA_Encoding_Method.cpp" file to check our encoding and decoding scheme.
+3. We can change the "homopoly" and "strandSize" variables in the "main" function for the selecting 
+homopoly = 2 and strandSize = 384.
+// Init the values of the required parameters for Homopoly = 1
+int homopoly = 1, contGCParts = 1, subSeqLen = 4, noOfInstances = 1,
+    gcVarMatLen = 16, blockLen = 12, strandSize = 192, inputBlockSize = 528;
+4. Please choose the file name and path correctly.
 
+string filePath = "D:\\PhDGoetheUni\\Works\\PhD_Work\\3.Encoding_Method_Paper\\Results\\datasets\\";
+string fileName = filePath + "anybeatAnonymized.csv";
 
+Sample output is given below:
 --------------------------------------------------------------
-Input DNA String: AGACTGACTATCCGACGATCCGCCAAGTGTCATCCCCCAGCTTTTCGACTCAAAGAACTAGGAACCCATGGGAAATCATTTATTAATTCCTCTTCGGTGAACAAGACTAGCTGACAAGTGTCTGGGCCACGAAGTGGGTACGTCGACAGG
-Encoded String: AGATCTGTACTCATCACGATCGAGTGCTGACTATGCTGTACATGCACTCGATGCTATATACGAGCTCTACACGCAGCTATGTACATCTCATAGAGCACAGTCAGTATGACTCAGTATGCGTCTGTCGAGTGCAGCTATGTACTGAGCGTGAGCTATGTGCTCTAGAGACGAGCGACAGTAGAGATACAGTCTGACTACGA
-Decoded String:
-AGACTGACTATCCGACGATCCGCCAAGTGTCATCCCCCAGCTTTTCGACTCAAAGAACTAGGAACCCATGGGAAATCATTTATTAATTCCTCTTCGGTGAACAAGACTAGCTGACAAGTGTCTGGGCCACGAAGTGGGTACGTCGACAGG
+Length of Bit String :2145696
+InputDNAStr length   :1072368
+EncodedDNAStr length :1429824
+ExtendedDNAStr length:1559808
+Size of block (nucleotides):192, Total blocks:   8124, Total hairpins: 1732
+Size of block (nucleotides):192, Total blocks:   8124, Total hairpins: 299
+ExtendedDNAStr length:1429824
+EncodedDNAStr length :1072368
+Successfully decoded!
+Homopolymers are fine:YES
+Information Density: 1.37562  and homopoly:1
+================= GC Variation =====================
+ATAC, ATCA, ATCG, ATGC, ACAT, ACTA, ACTG, ACGT, AGAG, AGTC, AGCT, TACA, TACG, TAGC, TCAG, TCTC,
+TCGA, TGAC, TGCA, TGCG, CATA, CATG, CAGT, CTAG, CTCT, CTGA, CGAT, CGTA, CGTG, GATC, GACT, GAGA,
+GTAC,
+================= GC Variation =====================
 
-Encoding-Decoding Correctness:OK.
+[
 
-Homopolymers don't exit:OK.
-================= GC Content =====================
-Part.1.GC Content:40%
-Part.2.GC Content:50%
-Part.3.GC Content:40%
-Part.4.GC Content:55%
-Part.5.GC Content:45%
-Part.6.GC Content:45%
-Part.7.GC Content:50%
-Part.8.GC Content:55%
-Part.9.GC Content:50%
-Part.10.GC Content:45%
-================= GC Content =====================
+0[75,27,21,39,18,19,30,33,46,35,25,27,20,15,21,27,8,10,28,17,0,0,0,0,0,0,0,0,0,47,39,6,27,],
+1[0,0,0,0,0,0,0,0,0,0,0,84,77,55,116,143,83,84,135,63,23,35,56,52,44,22,44,39,23,54,35,20,32,],
+2[43,116,109,119,83,89,96,119,81,194,113,51,51,43,45,40,23,24,31,29,31,26,27,18,19,5,18,2,2,0,0,0,0,],
+3[13,46,31,43,33,38,52,53,118,37,33,98,102,62,93,53,65,49,63,59,0,0,0,0,0,0,0,0,0,29,47,14,20,],
+4[3,6,8,12,23,24,19,109,36,24,12,0,0,0,0,0,0,0,0,0,28,49,70,30,50,26,41,53,46,74,76,43,80,],
+5[0,0,0,0,0,0,0,0,0,0,0,16,9,26,33,15,16,9,19,30,48,80,137,121,105,72,95,106,74,34,34,19,29,],
+6[21,98,85,134,87,99,146,110,94,89,49,44,43,38,70,31,19,15,50,36,48,44,62,52,45,30,38,89,43,0,0,0,0,],
+7[45,147,119,147,102,90,137,158,152,106,74,0,0,0,0,0,0,0,0,0,53,52,105,85,48,49,65,56,53,39,28,6,12,],
+8[29,31,35,36,14,12,27,42,62,76,12,162,85,70,115,68,111,59,106,48,54,67,69,103,57,84,78,47,39,0,0,0,0,],
+9[20,44,48,36,34,28,28,52,61,66,47,58,46,51,36,45,22,20,47,31,0,0,0,0,0,0,0,0,0,122,157,61,82,],
+10[5,26,19,19,44,23,29,39,45,27,16,0,0,0,0,0,0,0,0,0,13,12,30,37,30,11,40,44,32,93,74,42,66,],
+11[0,0,0,0,0,0,0,0,0,0,0,87,158,54,139,121,83,104,131,110,18,7,60,31,36,21,39,34,26,42,40,20,25,],
+12[149,164,117,132,59,80,91,84,155,110,65,50,48,31,43,42,24,14,35,26,26,32,35,27,18,9,11,10,11,0,0,0,0,],
+13[12,27,29,32,25,22,25,48,66,37,34,94,98,86,96,54,69,86,53,56,0,0,0,0,0,0,0,0,0,18,19,4,13,],
+14[19,34,42,49,20,24,27,61,36,41,17,97,63,83,150,81,98,58,110,70,71,69,98,75,89,56,75,62,57,0,0,0,0,],
+15[4,21,23,29,20,18,17,20,25,39,22,34,31,15,19,112,23,19,47,66,0,0,0,0,0,0,0,0,0,142,118,84,146,],
+16[0,0,0,0,0,0,0,0,0,0,0,59,53,40,57,44,37,23,43,23,43,30,53,68,28,40,42,27,27,40,31,18,26,],
+17[14,34,44,32,31,22,35,44,28,24,21,47,26,25,61,35,22,31,49,129,0,0,0,0,0,0,0,0,0,62,45,22,34,],
+18[0,0,0,0,0,0,0,0,0,0,0,61,94,50,122,83,73,73,128,81,31,24,47,57,40,22,45,29,21,45,111,25,22,],
+19[33,130,90,96,65,87,110,78,73,102,88,44,54,31,25,35,43,22,32,39,26,21,11,9,9,10,19,6,3,0,0,0,0,],
+20[0,0,0,0,0,0,0,0,0,0,0,4,5,8,21,9,2,3,22,20,78,93,134,51,66,76,95,100,60,23,13,12,17,],
+21[24,49,44,59,58,52,86,87,60,62,57,46,43,35,43,21,15,12,9,15,40,26,159,45,48,26,34,26,20,0,0,0,0,],
+22[73,119,105,94,88,123,147,115,96,113,55,0,0,0,0,0,0,0,0,0,61,72,153,85,77,46,111,95,147,63,55,22,14,],
+23[14,34,33,16,21,13,22,42,47,27,30,79,51,79,91,46,56,49,66,67,77,102,54,72,88,91,99,65,73,0,0,0,0,],
+24[5,43,30,28,35,24,39,47,22,19,22,0,0,0,0,0,0,0,0,0,13,23,33,42,50,63,37,55,53,125,107,69,118,],
+25[0,0,0,0,0,0,0,0,0,0,0,48,59,46,73,56,27,19,47,51,44,50,35,70,37,27,49,36,48,58,37,17,38,],
+26[3,5,13,10,37,25,21,37,53,33,24,0,0,0,0,0,0,0,0,0,35,54,67,61,39,25,66,101,92,108,93,136,97,],
+27[0,0,0,0,0,0,0,0,0,0,0,10,20,9,61,26,14,19,27,29,62,75,134,93,84,60,196,92,85,29,49,17,29,],
+28[43,82,80,47,83,82,139,107,72,88,62,42,22,20,26,29,12,10,8,4,12,14,49,49,19,14,22,131,121,0,0,0,0,],
+29[25,42,51,50,45,52,54,52,54,70,46,48,50,49,30,45,22,30,54,47,0,0,0,0,0,0,0,0,0,129,103,51,107,],
+30[9,24,17,16,34,51,49,53,46,51,20,0,0,0,0,0,0,0,0,0,33,30,47,39,60,19,37,35,47,184,173,82,119,],
+31[0,0,0,0,0,0,0,0,0,0,0,20,40,22,72,43,25,17,30,35,22,15,22,23,24,23,39,26,24,31,25,19,26,],
+32[14,60,48,58,41,43,34,50,73,50,26,56,53,49,65,39,25,30,52,47,0,0,0,0,0,0,0,0,0,55,60,86,37,],
+]
 
 ================= GC Variation =====================
-,"AAAA","ATCT","ATGC","ACAG","AGAC","AGTG","TACG","TCTA","TGAG","TGCA","CATG","CTAT","CTCG","GACA","GAGT","GTAC","GTGA","GCTC"
-[
-[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],
-[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-[0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
-[0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0],
-[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-[0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0],
-[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-[1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0],
-[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],]
- ================= GC Variation =====================
-Program Completed:Done!
+
+Total Blocks:5587 , homopoly: 0, Length:1072848
+Max and min GC content of any  :66, 18
+Total strands of the object    :5587
+Average GC content per strand  :40
+Average GC variation per strand:10
+Total Blocks:8124 , homopoly: 1, Length:1559808
+Max and min GC content of any  :57, 40
+Total strands of the object    :8124
+Average GC content per strand  :49
+Average GC variation per strand:1
+--------------------------------------
+C:\Users\admin\source\repos\DNAEncoding\x64\Debug\DNAEncoding.exe (process 1968) exited with code 0.
+To automatically close the console when debugging stops, enable Tools->Options->Debugging->Automatically close the console when debugging stops.
+Press any key to close this window . . .

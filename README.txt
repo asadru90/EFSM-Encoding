@@ -24,9 +24,8 @@ Successfully decoded!
 Homopolymers are fine:YES
 Information Density: 1.37562  and homopoly:1
 ================= GC Variation =====================
-ATAC, ATCA, ATCG, ATGC, ACAT, ACTA, ACTG, ACGT, AGAG, AGTC, AGCT, TACA, TACG, TAGC, TCAG, TCTC,
-TCGA, TGAC, TGCA, TGCG, CATA, CATG, CAGT, CTAG, CTCT, CTGA, CGAT, CGTA, CGTG, GATC, GACT, GAGA,
-GTAC,
+ATCA, ATCG, ATGC, ACAT, ACTA, ACTG, ACGT, AGAG, AGTC, AGCT, TACA, TACG, TAGC, TCAG, TCTC, TCGA, 
+TGAC, TGCA, TGCG, CATA, CATG, CAGT, CTAG, CTCT, CTGA, CGAT, CGTA, CGTG, GATC, GACT, GAGA, GTAC,
 ================= GC Variation =====================
 
 [
